@@ -13,34 +13,28 @@ LED::LED(int p){
 bool LED::toggle(){
     if !state{
         on();
-        return true;
     }
     else{
         off();
-        return false;
     }
+    return state;
 }
 
-void on(){
+void LED::on(){
     digitalWrite(pinNum, HIGH);
+    state = true;
 }
 
-void off(){
+void LED::off(){
     digitalWrite(pinNum, LOW);
+    state = false;
 }        
 
-void flashRetrieval(){
-    on();
-    delay(1000);
-    off();
+void LED::flashRetrieval(){
+    toggle();
     delay(1000);
 }
 
-bool getState(){
-    if state{
-        return true;
-    }
-    else{
-        return false;
-    }
+bool :ED::getState(){
+    return state;
 }  

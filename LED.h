@@ -24,6 +24,7 @@ class LED{
 
     private:
     bool state;
+    int pinNum;
     
 }
 
