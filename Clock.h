@@ -4,24 +4,24 @@
 
 #include "Arduino.h";
 
-	class Clock {
+class Clock {
+	
+	public:
+	
+	unsigned long ascentTime;
+	
+	Clock(int);
+	
+	void set();
+	bool check();
+	bool checkMan(int);
+	int checkAndWait();
+	
+	private:
 		
-		public:
+	int ticSpeed; //used for the constructor
 		
-		unsigned long ascentTime;
-		
-		Clock(int);
-		
-		void set();
-		bool check();
-		bool checkMan(int);
-		int checkAndWait();
-		
-		private:
-		
-		int ticSpeed; //used for the constructor
-		
-		unsigned long currTime;
-	};
+	unsigned long currTime;
+};
 
 #endif
