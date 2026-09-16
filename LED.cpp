@@ -1,5 +1,5 @@
 //must include arduino and the header file
-#include "arduino.h"
+#include "Arduino.h"
 #include "LED.h"
 
 
