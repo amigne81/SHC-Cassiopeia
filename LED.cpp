@@ -2,10 +2,11 @@
 #include "Arduino.h"
 #include "LED.h"
 
+
 //constructor
 LED::LED(int p){
-    bool state = false;
-    int pinNum = p;
+    state = false;
+    pinNum = p;
 
     pinMode(pinNum, OUTPUT)     //sets the pin the LED is on to be an output, or controllable
 }
@@ -30,11 +31,6 @@ void LED::off(){
     state = false;
 }        
 
-void LED::flashRetrieval(){
-    toggle();
-    delay(1000);
-}
-
-bool :ED::getState(){
+bool LED::getState(){
     return state;
 }  
