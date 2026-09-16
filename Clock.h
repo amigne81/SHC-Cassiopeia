@@ -8,7 +8,7 @@ class Clock {
 	
 	public:
 	
-	unsigned long ascentTime;
+	unsigned long elapsedTime;
 	
 	Clock(int);
 	

@@ -23,7 +23,7 @@ void Clock::set() {
 *False: Time elapsed has exceeded the tic requirement
 **/
 bool Clock::check() {
-	unsigned long int elapsedTime = millis()-currTime;
+	elapsedTime = millis()-currTime;
 	
 	return !( elapsedTime > ticSpeed );//elapsedTime <= ticSpeed
 }
@@ -33,7 +33,7 @@ bool Clock::check() {
 *False: Time elapsed has exceeded the inputted time
 **/
 bool Clock::checkMan(int time) {
-	unsigned long int elapsedTime = millis()-currTime;
+	elapsedTime = millis()-currTime;//:3
 	
 	return ! ( elapsedTime > time );//elapsedTime <= time
 }
@@ -47,7 +47,7 @@ bool Clock::checkMan(int time) {
 *  zero, if the time elapsed has exceeded the inputted time
 **/
 int Clock::checkAndWait() {
-	unsigned long int elapsedTime = millis()-currTime;
+	elapsedTime = millis()-currTime;
 	
 	if (check()) {
 		exceededTime = ticSpeed-elapsedTime;
