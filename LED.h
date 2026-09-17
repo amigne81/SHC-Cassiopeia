@@ -4,7 +4,7 @@
 #define LED_h;
 
 //includes the arduino functions
-#include <Ardunio.h>
+#include <Arduino.h>
 
 
 class LED{
