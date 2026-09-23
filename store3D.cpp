@@ -17,6 +17,18 @@ store3D::int setZ(int a){
 	z = a;
 }
 
+store3D::int getX(){
+	return x;
+}
+
+store3D::int getY(){
+	return y;
+}
+
+store3D::int getZ(){
+	return z;
+}
+
 store3D:: string outCSV(){
 	return x+", "+y+", "+z+", ";
 }
