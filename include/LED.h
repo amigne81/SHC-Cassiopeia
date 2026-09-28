@@ -25,6 +25,6 @@ class LED{
     bool state;
     int pinNum;
     
-}
+};
 
 #endif
