@@ -8,11 +8,11 @@ LED::LED(int p){
     state = false;
     pinNum = p;
 
-    pinMode(pinNum, OUTPUT)     //sets the pin the LED is on to be an output, or controllable
+    pinMode(pinNum, OUTPUT);     //sets the pin the LED is on to be an output, or controllable
 }
 
 bool LED::toggle(){
-    if !state{
+    if (!state){
         on();
     }
     else{
