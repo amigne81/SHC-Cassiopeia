@@ -10,7 +10,7 @@ this library will help as an example for when you create your own libraries :) y
 #ifndef LibEx_h;
 #define LibEx_h;
 
-#include "arduino.h";
+#include "Arduino.h"
 
 
 // a class is like a preset that the computer can use to recreate multiple identical copied versions of your code
