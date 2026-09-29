@@ -3,32 +3,39 @@
 #include "store3D.h"
 
 
-Data::int getTemp(){
-	return temp*1;
+int Data::getTemp(){
+	return Data::temp*1;
 }
-Data::int getAccX(){
-	return Acc.getX()*1;
+int Data::getAccX(){
+	return Data::Acc.getX()*1;
 }
-Data::int getAccY(){
-	return Acc.getY()*1;
+int Data::getAccY(){
+	return Data::Acc.getY()*1;
 }
-Data::int getAccZ(){
-	return Acc.getZ()*1;
+int Data::getAccZ(){
+	return Data::Acc.getZ()*1;
 }
-Data::int getGyroX(){
-	return Gyro.getX()*1;
+int Data::getGyroX(){
+	return Data::Gyro.getX()*1;
 }
-Data::int getGyroY(){
-	return Gyro.getY()*1;
+int Data::getGyroY(){
+	return Data::Gyro.getY()*1;
 }
-Data::int getGyroZ(){
-	return Gyro.getZ()*1;
+int Data::getGyroZ(){
+	return Data::Gyro.getZ()*1;
 }
-Data::int getH(){
-	return GPS.getZ()*1
+int Data::getH(){
+	return Data::GPS.getZ()*1;
 }
-Data::int getDh(){
-	return dh*1;
+int Data::getDh(){
+	return Data::GPS.dz*1;
 }
 
+std::string Data::timeCSV(){
+	return std::to_string(Data::time.elapsedTime);
+}
 
+std::string Data::outCSV(){
+	return std::to_string(Data::GPS.getZ()) + "," + std::to_string(Data::temp) + "," + Data::Acc.outCSV() + 
+	Data::Gyro.outCSV() + Data::GPS.outCSV();
+}

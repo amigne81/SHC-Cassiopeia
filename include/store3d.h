@@ -1,6 +1,7 @@
 
 #ifndef store3D_h
 #define store3D_h
+#include "string"
 
 class store3D{
 	private:
@@ -14,9 +15,9 @@ class store3D{
 	// returns private values
 	int getX();
 	int getY();
-	int hetZ();
+	int getZ();
 	// outputs values in csv format
-	string outCSV();
-	string outDCSV();
-}
+	std::string outCSV();
+	std::string outDCSV();
+};
 #endif
