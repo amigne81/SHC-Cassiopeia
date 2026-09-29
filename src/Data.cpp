@@ -31,4 +31,11 @@ int Data::getDh(){
 	return Data::GPS.dz*1;
 }
 
+std::string Data::timeCSV(){
+	return std::to_string(Data::time.elapsedTime);
+}
 
+std::string Data::outCSV(){
+	return std::to_string(Data::GPS.getZ()) + "," + std::to_string(Data::temp) + "," + Data::Acc.outCSV() + 
+	Data::Gyro.outCSV() + Data::GPS.outCSV();
+}

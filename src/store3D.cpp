@@ -36,3 +36,5 @@ std::string store3D::outCSV(){
 std::string store3D::outDCSV(){
 	return std::to_string(store3D::dx) + ", " + std::to_string(store3D::dy) + ", " + std::to_string(store3D::dz) + ", ";
 }
+
+
