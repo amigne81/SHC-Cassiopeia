@@ -20,6 +20,6 @@ struct Data{
 	int getGyroZ();
 	int getH();
 	int getDh();
-}
+};
 
 #endif

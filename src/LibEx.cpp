@@ -1,6 +1,6 @@
 
-#include "Arduino.h";
-#include "LibEx.h";
+#include "Arduino.h"
+#include "LibEx.h"
 // this is the second and more common way to write a comment and will set the whole line to a comment!
 
 // the part before the (::) tells the program that this is an object from the LibEx class

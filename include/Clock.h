@@ -2,13 +2,13 @@
 #ifndef Clock_h
 #define Clock_h
 
-#include "Arduino.h";
+#include "Arduino.h"
 
 class Clock {
 	
 	public:
 	
-	unsigned long elapsedTime;
+	unsigned long int elapsedTime;
 	
 	Clock(int);
 	
@@ -20,8 +20,8 @@ class Clock {
 	private:
 		
 	int ticSpeed; //used for the constructor
-		
-	unsigned long currTime;
+	unsigned int exceededTime;
+	unsigned long int currTime;
 };
 
 #endif
