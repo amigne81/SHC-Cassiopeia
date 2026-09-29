@@ -20,6 +20,8 @@ class Clock {
 	private:
 		
 	int ticSpeed; //used for the constructor
+
+	unsigned long exceededTime;
 		
 	unsigned long currTime;
 };
