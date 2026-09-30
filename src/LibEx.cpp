@@ -1,4 +1,4 @@
-
+/*
 #include "Arduino.h"
 #include "LibEx.h"
 // this is the second and more common way to write a comment and will set the whole line to a comment!
@@ -36,3 +36,4 @@ void LibEx::OutValue(bool x){
 	}else
 		digitalWrite(pDigital,LOW);
 }
+		*/

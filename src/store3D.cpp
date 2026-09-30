@@ -1,40 +1,39 @@
-
+/*
 #include "store3D.h"
-#include "string"
+#include "strings"
 
-void store3D::setX(int a){
-	store3D::dx = a-x;
+store3D::int setX(int a){
+	dx = a-x;
 	x = a;
 }
 
-void store3D::setY(int a){
-	store3D::dy = a-y;
+store3D::int setY(int a){
+	dy = a-y;
 	y = a;
 }
 
-void store3D::setZ(int a){
-	store3D::dz = a-z;
+store3D::int setZ(int a){
+	dz = a-z;
 	z = a;
 }
 
-int store3D::getX(){
-	return store3D::x;
+store3D::int getX(){
+	return x;
 }
 
-int store3D::getY(){
-	return store3D::y;
+store3D::int getY(){
+	return y;
 }
 
-int store3D::getZ(){
-	return store3D::z;
+store3D::int getZ(){
+	return z;
 }
 
-std::string store3D::outCSV(){
-	return std::to_string(store3D::x) + ", " + std::to_string(store3D::y) + ", " + std::to_string(store3D::z) + ", ";
+store3D:: string outCSV(){
+	return x+", "+y+", "+z+", ";
 }
 
-std::string store3D::outDCSV(){
-	return std::to_string(store3D::dx) + ", " + std::to_string(store3D::dy) + ", " + std::to_string(store3D::dz) + ", ";
-}
-
-
+store3D:: string outdCSV(){
+	return dx+", "+dy+", "+dz+", ";
+} 
+	*/
