@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "LED.h"
-#include "SHC_BME280"
+#include <SHC_BME280.h>
 
 // put function declarations here:
 int myFunction(int, int);

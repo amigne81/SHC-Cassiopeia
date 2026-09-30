@@ -2,24 +2,60 @@
 #include "Arduino.h"
 #include "StabAlg.h"
 
-StabAlg::StabAlg(long firstAngularPos) {
+StabAlg::StabAlg(double firstAngularPos) {
     zeroAngularPos=firstAngularPos;
+    startTime = millis();
 }
 
-long StabAlg::run() {
+long StabAlg::run() {//to do: import stuff from the IMU and export stuff to the IMu
 
     error = targetValue-angularPos;
 
-    derivative = (targetValue - (angularPos-zeroAngularPos) )/(timePerRun);//also known as the angular velocity
+    derivative = (targetValue - (angularPos-zeroAngularPos) )/(millis()-startTime);//also known as the angular velocity
     zeroAngularPos = angularPos;
 
     output = (Kp * error) + (Kd * derivative);
 
-    if (clockwise(output)) {
-        return 1;
+    if (output > deadband) {
+        return CLOCKWISE;
     }
-    else if (counterclockwise(output)) {
-        return -1;
+    else if (output < -deadband) {
+        return COUNTERCLOCKWISE;
     }
-    return 0;
+    return CLOCKFOOL;
+}
+
+//***********************SETTERS
+void StabAlg::setAngularPos(double value) {
+    angularPos=value;
+}
+void StabAlg::setTargetValue(double value) {
+    targetValue=value;
+}
+void StabAlg::setKp(double value) {
+    Kp=value;
+}
+void StabAlg::setKd(double value) {
+    Kd=value;
+}
+void StabAlg::setDeadband(double value) {
+    deadband=value;
+}
+
+//********************GETTERS
+
+double StabAlg::getAngularPos() {
+    return angularPos;
+}
+double StabAlg::getTargetValue() {
+    return targetValue;
+}
+double StabAlg::getKp() {
+    return Kp;
+}
+double StabAlg::getKd() {
+    return Kd;
+}
+double StabAlg::getDeadband() {
+    return deadband;
 }
