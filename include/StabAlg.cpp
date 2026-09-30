@@ -7,7 +7,11 @@ StabAlg::StabAlg(double firstAngularPos) {
     startTime = millis();
 }
 
-long StabAlg::run() {//to do: import stuff from the IMU and export stuff to the IMu
+//is there is an error, check for missing pre-fetch.
+//if you don't know what that is, as Sam :D
+long StabAlg::run() {
+
+    angularPos = BNO.getOrientationX();
 
     error = targetValue-angularPos;
 
