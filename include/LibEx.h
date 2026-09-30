@@ -7,8 +7,8 @@ this library will help as an example for when you create your own libraries :) y
 
 /* it works like this!*/
 
-#ifndef LibEx_h;
-#define LibEx_h;
+#ifndef LibEx_h
+#define LibEx_h
 
 #include "Arduino.h"
 

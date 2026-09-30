@@ -4,6 +4,7 @@
 
 #include "store3D.h"
 #include "Clock.h"
+#include "string"
 
 struct Data{
 	public:
@@ -20,6 +21,9 @@ struct Data{
 	int getGyroZ();
 	int getH();
 	int getDh();
-}
+
+	std::string timeCSV();
+	std::string outCSV();
+};
 
 #endif

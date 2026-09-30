@@ -2,13 +2,13 @@
 #ifndef Clock_h
 #define Clock_h
 
-#include "Arduino.h";
+#include "Arduino.h"
 
 class Clock {
 	
 	public:
 	
-	unsigned long elapsedTime;
+	unsigned long int elapsedTime;
 	
 	Clock(int);
 	

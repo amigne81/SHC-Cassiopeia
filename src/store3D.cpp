@@ -1,4 +1,4 @@
-
+/*
 #include "store3D.h"
 #include "strings"
 
@@ -35,4 +35,5 @@ store3D:: string outCSV(){
 
 store3D:: string outdCSV(){
 	return dx+", "+dy+", "+dz+", ";
-}
+} 
+	*/
