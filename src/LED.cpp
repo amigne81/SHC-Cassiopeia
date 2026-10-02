@@ -5,32 +5,36 @@
 
 //constructor
 LED::LED(int p){
-    state = false;
+    isOn = false;
     pinNum = p;
 
     pinMode(pinNum, OUTPUT);     //sets the pin the LED is on to be an output, or controllable
 }
 
+//toggles the LED and returns the state
 bool LED::toggle(){
-    if (!state){
+    if (!isOn){
         on();
     }
     else{
         off();
     }
-    return state;
+    return isOn;
 }
 
+//turns on LED and edits state to on
 void LED::on(){
     digitalWrite(pinNum, HIGH);
-    state = true;
+    isOn = true;
 }
 
+//turns off LED and edits state to off
 void LED::off(){
     digitalWrite(pinNum, LOW);
-    state = false;
+    isOn = false;
 }        
 
+//returns the state of the LED
 bool LED::getState(){
-    return state;
+    return isOn;
 }  
