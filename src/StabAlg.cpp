@@ -24,6 +24,7 @@ long StabAlg::testRun() {
 
     output = (Kp * error) + (Kd * derivative);
 
+    //thruster direction output
     if (output > deadband) {
         return CLOCKWISE;
     }
@@ -56,6 +57,7 @@ long StabAlg::autoTargetRun(unsigned long millisecondUpdate) {
 
     timeGoneBy += (millis()-k);
 
+    //thruster direction output
     if (output > deadband) {
         return CLOCKWISE;
     }
@@ -120,9 +122,6 @@ double StabAlg::findNewTarget() {
 }
 
 //***********************SETTERS
-void StabAlg::setAngularPos(double value) {
-    angularPos=value;
-}
 void StabAlg::setTargetValue(double value) {
     targetValue=value;
 }
@@ -137,7 +136,6 @@ void StabAlg::setDeadband(double value) {
 }
 
 //********************GETTERS
-
 double StabAlg::getAngularPos() {
     return angularPos;
 }
