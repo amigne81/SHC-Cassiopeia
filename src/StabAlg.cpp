@@ -66,7 +66,7 @@ double StabAlg::findNewTarget() {
     int min = M9N.getMinute();
     double latitude = M9N.getLatitude();//degrees
     double longitude = M9N.getLongitude();//degrees
-    int GHT = 5;//Central Daylight Time
+    int GHT = -5;//Central Daylight Time
 
     double latitudeRad = latitude * PI / 180.0;
 
