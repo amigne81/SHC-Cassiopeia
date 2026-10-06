@@ -26,18 +26,24 @@ void setup() {
   Wire.begin();  
 
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(18, OUTPUT);
+  pinMode(19, OUTPUT);
   Serial.begin(9600);
 
-  GPSinit();
-  BNOinit();
+  //GPSinit();
+  //BNOinit();
+  Serial.println("ran BNO in it");
   BMEinit();
+  Serial.println("did run BME in it");
 }
 
 //to test indiviudally comment out the ___test() and ___init() above
 void loop() {
-  GPStest();
-  BNOtest();
+  //GPStest();
+  //BNOtest();
+  //Serial.println("ran BNO test");
   BMEtest();
+  Serial.println("ran BME test");
   delay(50);
 }
 
@@ -100,7 +106,10 @@ void BNOtest() {
 }
 
 void BMEinit() {
+  Serial.println(press.init());
   while (press.init() != NO_ERROR) {
+      Serial.println("it made it in it bno");
+
     digitalWrite(LED_BUILTIN, HIGH);
     delay(500);
     digitalWrite(LED_BUILTIN, LOW);
