@@ -18,10 +18,13 @@ class StabAlg {
 
     StabAlg(double);//takes in the first angular position
 
-    long run();//returns 1-> GO CLOCK; -1-> GO COUNTER; 0-> DO NOTHING
+    long testRun();//returns 1-> GO CLOCK; -1-> GO COUNTER; 0-> DO NOTHING
+    long autoTargetRun(unsigned long);//similar to testRun, just auto changes the targetValue every inputted milliseconds
+
+    long timeGoneBy;
 
     void setAngularPos(double);
-    void setTargetValue(double);//should be adjusted by Orientation
+    void setTargetValue(double);
     double getAngularPos();
     double getTargetValue();
 
@@ -35,11 +38,12 @@ class StabAlg {
 
     private://************PRIVATE**************
 
-    unsigned long startTime;
+    double findNewTarget();
 
-    double zeroAngularPos;
+    double previousAngularPos;
+    unsigned long previousTime;
     double angularPos;
-    double targetValue;
+    double targetValue=0;//true north
 
     double output;
     double error;
