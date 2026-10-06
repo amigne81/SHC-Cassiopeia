@@ -3,8 +3,8 @@
 #include "StabAlg.h"
 
 StabAlg::StabAlg(double firstAngularPos) {
-    zeroAngularPos=firstAngularPos;
-    startTime = millis();
+    previousAngularPos=firstAngularPos;
+    previousTime=millis();
 }
 
 //is there is an error, check for missing pre-fetch.
@@ -16,8 +16,11 @@ long StabAlg::testRun() {
 
     error = targetValue-angularPos;
 
-    derivative = (targetValue - (angularPos-zeroAngularPos) )/(millis()-startTime);//also known as the angular velocity
-    zeroAngularPos = angularPos;
+    unsigned long currTime = millis();
+
+    derivative = (angularPos-previousAngularPos)/(currTime-previousTime);//also known as the angular velocity
+    previousAngularPos = angularPos;
+    previousTime = currTime;
 
     output = (Kp * error) + (Kd * derivative);
 
@@ -32,9 +35,8 @@ long StabAlg::testRun() {
 
 //This method below should be placed in loop() because of the variable timeGoneBy. May work improperly otherwise.
 long StabAlg::autoTargetRun(unsigned long millisecondUpdate) {
-    unsigned long updateTime = 0.001*millisecondUpdate;//minutes
 
-    if (timeGoneBy>=updateTime) {
+    if (timeGoneBy>=millisecondUpdate) {
         targetValue = findNewTarget();
         timeGoneBy = 0;
     }
@@ -43,12 +45,16 @@ long StabAlg::autoTargetRun(unsigned long millisecondUpdate) {
 
     error = targetValue-angularPos;
 
-    derivative = (targetValue - (angularPos-zeroAngularPos) )/(millis()-startTime);//also known as the angular velocity
-    zeroAngularPos = angularPos;
+    unsigned long currTime = millis();
+
+    derivative = (angularPos-previousAngularPos)/(currTime - previousTime);//also known as the angular velocity
+    previousAngularPos = angularPos;
+    unsigned long k = previousTime;
+    previousTime = currTime;
 
     output = (Kp * error) + (Kd * derivative);
 
-    timeGoneBy += (millis()-startTime);
+    timeGoneBy += (millis()-k);
 
     if (output > deadband) {
         return CLOCKWISE;
@@ -71,22 +77,27 @@ double StabAlg::findNewTarget() {
     double latitudeRad = latitude * PI / 180.0;
 
     double fractionalYear = ( (2*PI)/365 ) * (day-1 + ( (hour-12)/24.0 ));
+
+    double cosFY = cos(fractionalYear);
+    double sinFY = sin(fractionalYear);
+    double cos2FY = cos(2 * fractionalYear);
+    double sin2FY = sin(2 * fractionalYear);
     
     double equationOfTime = //Equation of Time; Spencer approximation
             229.18 * (
             0.000075
-            + 0.001868 * cos(fractionalYear)
-            - 0.032077 * sin(fractionalYear)
-            - 0.014615 * cos(2 * fractionalYear)
-            - 0.040849 * sin(2 * fractionalYear)
+            + 0.001868 * cosFY
+            - 0.032077 * sinFY
+            - 0.014615 * cos2FY
+            - 0.040849 * sin2FY
         );
 
     double declinationRad =
           0.006918
-        - 0.399912 * cos(fractionalYear)
-        + 0.070257 * sin(fractionalYear)
-        - 0.006758 * cos(2 * fractionalYear)
-        + 0.000907 * sin(2 * fractionalYear)
+        - 0.399912 * cosFY
+        + 0.070257 * sinFY
+        - 0.006758 * cos2FY
+        + 0.000907 * sin2FY
         - 0.002697 * cos(3 * fractionalYear)
         + 0.001480 * sin(3 * fractionalYear);//radians
     
@@ -104,7 +115,6 @@ double StabAlg::findNewTarget() {
     double azimuthDeg = (azimuthRad * 180.0) / PI;
     if (azimuthDeg < 0) //to deal with the range that atan2 gives us
         azimuthDeg += 360.0;
-
 
     return azimuthDeg;
 }

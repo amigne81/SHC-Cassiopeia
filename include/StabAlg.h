@@ -38,11 +38,10 @@ class StabAlg {
 
     private://************PRIVATE**************
 
-    unsigned long startTime;
-
     double findNewTarget();
 
-    double zeroAngularPos;
+    double previousAngularPos;
+    unsigned long previousTime;
     double angularPos;
     double targetValue=0;//true north
 
