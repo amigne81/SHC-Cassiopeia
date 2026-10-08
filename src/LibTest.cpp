@@ -26,24 +26,18 @@ void setup() {
   Wire.begin();  
 
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(18, OUTPUT);
-  pinMode(19, OUTPUT);
   Serial.begin(9600);
 
-  //GPSinit();
+  GPSinit();
   //BNOinit();
-  Serial.println("ran BNO in it");
-  BMEinit();
-  Serial.println("did run BME in it");
+  //BMEinit();
 }
 
 //to test indiviudally comment out the ___test() and ___init() above
 void loop() {
-  //GPStest();
+  GPStest();
   //BNOtest();
-  //Serial.println("ran BNO test");
-  BMEtest();
-  Serial.println("ran BME test");
+  //BMEtest();
   delay(50);
 }
 
