@@ -1,6 +1,8 @@
 
 #ifndef StabAlg_h
 #define StabAlg_h
+#include "SHC_M9N.h"
+#include "SHC_BNO055.h"
 
 #include "Arduino.h";
 
@@ -15,8 +17,10 @@ class StabAlg {
 
     public:
 
+    StabAlg(M9N, BNO055);
 
-    StabAlg(double);//takes in the first angular position
+    M9N m9n;
+    BNO055 bno;
 
     long testRun();//returns 1-> GO CLOCK; -1-> GO COUNTER; 0-> DO NOTHING
     long autoTargetRun(unsigned long);//similar to testRun, just auto changes the targetValue every inputted milliseconds

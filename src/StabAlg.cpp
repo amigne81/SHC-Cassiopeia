@@ -1,9 +1,13 @@
 
 #include "Arduino.h"
 #include "StabAlg.h"
+#include "SHC_M9N.h"
+#include "SHC_BNO055.h"
 
-StabAlg::StabAlg(double firstAngularPos) {
-    previousAngularPos=firstAngularPos;
+StabAlg::StabAlg(M9N men, BNO055 bro) {
+    m9n = men;
+    bno = bro;
+    previousAngularPos=bno.getOrientationX();
     previousTime=millis();
 }
 
@@ -12,7 +16,7 @@ StabAlg::StabAlg(double firstAngularPos) {
 //This method is where you can adjust the targetValue
 long StabAlg::testRun() {
 
-    angularPos = BNO.getOrientationX();
+    angularPos = bno.getOrientationX();
 
     error = targetValue-angularPos;
 
@@ -42,7 +46,7 @@ long StabAlg::autoTargetRun(unsigned long millisecondUpdate) {
         timeGoneBy = 0;
     }
 
-    angularPos = BNO.getOrientationX();
+    angularPos = bno.getOrientationX();
 
     error = targetValue-angularPos;
 
@@ -70,10 +74,10 @@ long StabAlg::autoTargetRun(unsigned long millisecondUpdate) {
 //NOTE: THE BELOW CODE IS SET TO RUN ON 10/25/26. FOR TESTING, MAY NEED TO ADJUST VALUES
 double StabAlg::findNewTarget() {
     int day = 298;//october 25th, 2026 (not a leap year); launch day
-    int hour = M9N.getHour();
-    int min = M9N.getMinute();
-    double latitude = M9N.getLatitude();//degrees
-    double longitude = M9N.getLongitude();//degrees
+    int hour = m9n.getHour();
+    int min = m9n.getMinute();
+    double latitude = m9n.getLatitude();//degrees
+    double longitude = m9n.getLongitude();//degrees
     int GHT = -5;//Central Daylight Time
 
     double latitudeRad = latitude * PI / 180.0;
