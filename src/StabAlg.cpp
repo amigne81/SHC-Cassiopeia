@@ -1,4 +1,12 @@
 
+//orientation -> position
+//gyroscope -> velocity
+//acceleration -> ...
+
+//orientation x -> yaw
+//orientation y -> pitch
+//orientation z -> roll
+
 #include "Arduino.h"
 #include "StabAlg.h"
 #include "SHC_M9N.h"
@@ -23,6 +31,7 @@ long StabAlg::testRun() {
     unsigned long currTime = millis();
 
     derivative = (angularPos-previousAngularPos)/(currTime-previousTime);//also known as the angular velocity
+    //derivative = bno.getGyroX;//OR we can do this??
     previousAngularPos = angularPos;
     previousTime = currTime;
 
@@ -50,9 +59,9 @@ long StabAlg::autoTargetRun(unsigned long millisecondUpdate) {
 
     error = targetValue-angularPos;
 
-    unsigned long currTime = millis();
+    unsigned long currTime = millis();//note: this is in milliseconds
 
-    derivative = (angularPos-previousAngularPos)/(currTime - previousTime);//also known as the angular velocity
+    derivative = (angularPos-previousAngularPos)/((currTime - previousTime)/1000);//also known as the angular velocity, deg/s
     previousAngularPos = angularPos;
     unsigned long k = previousTime;
     previousTime = currTime;
@@ -71,7 +80,7 @@ long StabAlg::autoTargetRun(unsigned long millisecondUpdate) {
     return CLOCKFOOL;//thrusters don't turn on
 }
 
-//NOTE: THE BELOW CODE IS SET TO RUN ON 10/25/26. FOR TESTING, MAY NEED TO ADJUST VALUES
+//Note: The math below runs well enough -Alexander
 double StabAlg::findNewTarget() {
     int day = 298;//october 25th, 2026 (not a leap year); launch day
     int hour = m9n.getHour();
