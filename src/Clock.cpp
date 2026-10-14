@@ -15,7 +15,9 @@ unsigned long int Clock::tUTC(){
 }
 
 unsigned long int Clock::dt(){
-	return millis() - Clock::previous;
+	unsigned long int out = millis() - Clock::previous;
+	previous = millis();
+	return out
 }
 
 

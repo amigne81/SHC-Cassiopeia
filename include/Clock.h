@@ -6,13 +6,12 @@
 
 class Clock {
 	private: 
-	
-
-	public:
 	unsigned long int previous = 0;
 	unsigned long int utc;
 
-	void setUTC(unsigned long int); 
+	public:
+	unsigned long int 
+	void setUTC(long unsigned int); 
 	unsigned long int t();
 	unsigned long int tUTC();
 	unsigned long int dt();
