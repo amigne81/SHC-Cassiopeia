@@ -25,7 +25,7 @@ struct Data{
 	int getH();
 	int getDh();
 
-	std::string outCSV(int);
+	std::string outCSV();
 };
 
 #endif

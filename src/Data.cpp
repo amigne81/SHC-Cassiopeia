@@ -32,9 +32,9 @@ int Data::getDh(){
 }
 
 // outputs all required
-std::string Data::outCSV(int t){
+std::string Data::outCSV(){
 	Data::count++;
-	return std::to_string(Data::ID) + ", "+ /*rework clock to function as a time check and not time standardize*/ 
+	return std::to_string(Data::ID) + ", " + std::to_string(time.t()) + ", " + std::to_string(time.tUTC()) + ", " +
 	std::to_string(Data::GPS.getZ()) + "," + std::to_string(Data::temp) + "," + Data::Acc.outCSV() + 
 	std::to_string(t) +std::to_string(Data::state)+ ", "+ std::to_string(Data::count) + ", " + 
 	std::to_string(Data::temp) + ", " + Data::Gyro.outCSV() + Data::GPS.outCSV();
