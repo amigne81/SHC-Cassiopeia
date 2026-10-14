@@ -5,7 +5,19 @@
 #include "Arduino.h"
 
 class Clock {
+	private: 
 	
+
+	public:
+	unsigned long int previous = 0;
+	unsigned long int utc;
+
+	void setUTC(unsigned long int); 
+	unsigned long int t();
+	unsigned long int tUTC();
+	unsigned long int dt();
+	
+	/*
 	public:
 	
 	unsigned long int elapsedTime;
@@ -24,6 +36,7 @@ class Clock {
 	unsigned long exceededTime;
 		
 	unsigned long currTime;
+	*/
 };
 
 #endif

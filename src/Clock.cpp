@@ -2,50 +2,65 @@
 #include "Arduino.h"
 #include "Clock.h"
 
-/**
-*Constructor for Clock. Takes tic speed.
-**/
+void Clock::setUTC(unsigned long int a){
+	Clock::utc = a;
+}
+
+unsigned long int Clock::t(){
+	return millis();
+}
+
+unsigned long int Clock::tUTC(){
+	return millis() + Clock::utc;
+}
+
+unsigned long int Clock::dt(){
+	return millis() - Clock::previous;
+}
+
+
+/*
 Clock::Clock(int ticSpeed) {
 	this->ticSpeed = ticSpeed; //NOT this.ticSpeed
 }
 
 //**********METHODS***********
 
-/**
-*Stores the current time
-**/
+
+//Stores the current time
+
 void Clock::set() {
 	currTime = millis();
 }
 
-/**
-*True: Time elapsed is less than or equal to the tic speed
-*False: Time elapsed has exceeded the tic requirement
-**/
+
+// True: Time elapsed is less than or equal to the tic speed
+// False: Time elapsed has exceeded the tic requirement
+
 bool Clock::check() {
 	elapsedTime = millis()-currTime;
 	
 	return !( elapsedTime > ticSpeed );//elapsedTime <= ticSpeed
 }
 
-/**
-*True: Time elapsed is less than or equal to the input time
-*False: Time elapsed has exceeded the inputted time
-**/
+
+// True: Time elapsed is less than or equal to the input time
+// False: Time elapsed has exceeded the inputted time
+
 bool Clock::checkMan(int time) {
 	elapsedTime = millis()-currTime;//:3
 	
 	return ! ( elapsedTime > time );//elapsedTime <= time
 }
 
-/**
-*Checks the current time and if it is within the tic parameter. 
-*It will delay until the end of the tic.
-*
-*return:
-*  the exceeded time, if time elapsed is less than or equal to the tic speed
-*  zero, if the time elapsed has exceeded the inputted time
-**/
+
+// Checks the current time and if it is within the tic parameter. 
+// It will delay until the end of the tic.
+//
+// return:
+//   the exceeded time, if time elapsed is less than or equal to the tic speed
+//   zero, if the time elapsed has exceeded the inputted time
+
 int Clock::checkAndWait() {
 	elapsedTime = millis()-currTime;
 	
@@ -57,3 +72,4 @@ int Clock::checkAndWait() {
 	}
 	return 0;
 }
+*/
