@@ -31,11 +31,11 @@ int Data::getDh(){
 	return Data::GPS.dz*1;
 }
 
-std::string Data::timeCSV(){
-	return std::to_string(Data::time.elapsedTime);
-}
-
-std::string Data::outCSV(){
-	return std::to_string(Data::GPS.getZ()) + "," + std::to_string(Data::temp) + "," + Data::Acc.outCSV() + 
-	Data::Gyro.outCSV() + Data::GPS.outCSV();
+// outputs all required
+std::string Data::outCSV(int t){
+	Data::count++;
+	return std::to_string(Data::ID) + ", "+ /*rework clock to function as a time check and not time standardize*/ 
+	std::to_string(Data::GPS.getZ()) + "," + std::to_string(Data::temp) + "," + Data::Acc.outCSV() + 
+	std::to_string(t) +std::to_string(Data::state)+ ", "+ std::to_string(Data::count) + ", " + 
+	std::to_string(Data::temp) + ", " + Data::Gyro.outCSV() + Data::GPS.outCSV();
 }

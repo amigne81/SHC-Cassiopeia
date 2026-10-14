@@ -11,7 +11,10 @@ struct Data{
 	store3D Acc, Gyro, GPS;
 	Clock time;
 	int temp;
-	
+	int state;
+	int ID = 123456789;
+	int count = 0;
+
 	int getTemp();
 	int getAccX();
 	int getAccY();
@@ -22,8 +25,7 @@ struct Data{
 	int getH();
 	int getDh();
 
-	std::string timeCSV();
-	std::string outCSV();
+	std::string outCSV(int);
 };
 
 #endif
