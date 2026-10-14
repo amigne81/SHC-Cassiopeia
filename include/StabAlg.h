@@ -1,6 +1,8 @@
 
 #ifndef StabAlg_h
 #define StabAlg_h
+#include "SHC_M9N.h"
+#include "SHC_BNO055.h"
 
 #include "Arduino.h";
 
@@ -15,13 +17,16 @@ class StabAlg {
 
     public:
 
+    StabAlg(M9N, BNO055);
 
-    StabAlg(double);//takes in the first angular position
+    M9N m9n;
+    BNO055 bno;
 
-    long run();//returns 1-> GO CLOCK; -1-> GO COUNTER; 0-> DO NOTHING
+    long testRun();//returns 1-> GO CLOCK; -1-> GO COUNTER; 0-> DO NOTHING
+    long autoTargetRun(unsigned long);//similar to testRun, just auto changes the targetValue every inputted milliseconds
 
     void setAngularPos(double);
-    void setTargetValue(double);//should be adjusted by Orientation
+    void setTargetValue(double);
     double getAngularPos();
     double getTargetValue();
 
@@ -35,18 +40,22 @@ class StabAlg {
 
     private://************PRIVATE**************
 
-    unsigned long startTime;
+    double findNewTarget();
 
-    double zeroAngularPos;
-    double angularPos;
-    double targetValue;
+    long timeGoneBy;//milliseconds
+
+    double previousAngularPos;//degrees
+    unsigned long previousTime;//milliseconds
+    double angularPos;//degrees
+    double targetValue=0;//default: true north
 
     double output;
-    double error;
-    double derivative;
+    double error;//degrees
+    double derivative;//degrees per second
 
-    double Kp;
-    double Kd;
+    //K values can be adjusted to anything you want
+    double Kp=1;
+    double Kd=1;
 
     double deadband=15;//degrees, default value from the bible
 

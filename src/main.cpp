@@ -1,15 +1,15 @@
 #include <Arduino.h>
 #include "LED.h"
-#include <SHC_BME280.h>
+//#include <SHC_BME280.h>
 
 // put function declarations here:
 int myFunction(int, int);
-LED light = LED(3);
+LED light = LED(LED_BUILTIN);
 
 
 void setup() {
   // put your setup code here, to run once:
-light = LED(3);
+light = LED(LED_BUILTIN);
 Serial.begin(9600);
 Serial.println("Started!");
 }
@@ -17,7 +17,7 @@ Serial.println("Started!");
 void loop() {
   // put your main code here, to run repeatedly:
   light.toggle();
-  delay(1000);
+  delay(5000);
   Serial.println("hello");
 }
 

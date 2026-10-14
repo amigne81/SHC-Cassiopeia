@@ -22,7 +22,7 @@ class LED{
     bool getState();       //will return the state of the LED
 
     private:
-    bool state;
+    bool isOn;
     int pinNum;
     
 };

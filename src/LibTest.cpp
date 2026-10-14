@@ -29,19 +29,21 @@ void setup() {
   Serial.begin(9600);
 
   GPSinit();
-  BNOinit();
-  BMEinit();
+  //BNOinit();
+  //BMEinit();
 }
 
+//to test indiviudally comment out the ___test() and ___init() above
 void loop() {
   GPStest();
-  BNOtest();
-  BMEtest();
+  //BNOtest();
+  //BMEtest();
   delay(50);
 }
 
 
 // Testing functions to make it easier to put into the setup and loop
+//init functions check if the sensor can be initalized
 void GPSinit() {
   while (gps.init() != NO_ERROR) {
     digitalWrite(LED_BUILTIN, HIGH);
@@ -98,7 +100,10 @@ void BNOtest() {
 }
 
 void BMEinit() {
+  Serial.println(press.init());
   while (press.init() != NO_ERROR) {
+      Serial.println("it made it in it bno");
+
     digitalWrite(LED_BUILTIN, HIGH);
     delay(500);
     digitalWrite(LED_BUILTIN, LOW);
@@ -112,8 +117,5 @@ void BMEtest() {
   Serial.println("Pressue: " + String(press.getPressure()));
   Serial.println("Temperature: " + String(press.getTemperature()));
   Serial.println("Altitude: " + String(press.getAltitude()));
-  Serial.println("Humidity: " + String(press.getHumidity()));
-  
+  Serial.println("Humidity: " + String(press.getHumidity())); 
 }
-
-
