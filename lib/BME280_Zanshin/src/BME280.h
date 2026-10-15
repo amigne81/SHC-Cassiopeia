@@ -171,6 +171,7 @@
       */
       template< typename T > uint8_t &getData(const uint8_t addr,T &value)
       {
+        _I2CAddress = 0x77; //this fixes it somehow
         uint8_t* bytePtr    = (uint8_t*)&value; // Pointer to structure beginning
         static uint8_t  structSize = sizeof(T); // Number of bytes in structure
         if (_I2CAddress) // If I2C address is non-zero then assume I2C bus

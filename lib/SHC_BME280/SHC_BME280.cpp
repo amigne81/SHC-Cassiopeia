@@ -5,11 +5,12 @@
 #include <BME280.h>  
 
 Error SHC_BME280::init() {
-    // BME280::Settings settings;
-    // settings.i2cAddress = 0x77;
+    //BME280::Settings settings;
+    //settings.i2cAddress = 0x77;
     if (!bme.begin()) {
         return BME_ERROR;
     }
+
     bme.mode(ForcedMode); // Force one measurement to begin
     bme.setOversampling(TemperatureSensor,Oversample16);
     bme.setOversampling(HumiditySensor,   Oversample16);

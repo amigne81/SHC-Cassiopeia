@@ -29,18 +29,21 @@ void setup() {
   Serial.begin(9600);
 
   GPSinit();
-  //BNOinit();
-  //BMEinit();
+  BNOinit();
+  Serial.println("moments before catastrophe");
+  BMEinit();
 }
 
 //to test indiviudally comment out the ___test() and ___init() above
 void loop() {
   GPStest();
-  //BNOtest();
-  //BMEtest();
-  delay(50);
+  Serial.println("\n");
+  BNOtest();
+  Serial.println("\n");
+  BMEtest();
+  Serial.println("\n");
+  delay(3000);
 }
-
 
 // Testing functions to make it easier to put into the setup and loop
 //init functions check if the sensor can be initalized

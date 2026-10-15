@@ -30,7 +30,7 @@ bool BME280_Class::begin()
 */
 bool BME280_Class::begin(const uint32_t i2cSpeed)
 {
-  Wire.begin();            // Start I2C as master device
+  //Wire.begin();            // Start I2C as master device
   Wire.setClock(i2cSpeed); // Set I2C bus speed
   for(_I2CAddress=0;_I2CAddress<127;_I2CAddress++) // loop all possible addresses
   {
