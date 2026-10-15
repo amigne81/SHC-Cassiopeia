@@ -13,13 +13,12 @@
 Data rec;
 StabAlg TheUK;
 LED LED1(-1), LED2(-1);
- 
 
 //    sensors
 SFE_UBLOX_GNSS hotMenInYourArea;
 BNO055 gayDar;
 SHC_BME280 grass;
-Adafruit_BNO055 fruityMcFruitFace;
+Adafruit_INA260 power;
 
 // global variable intialization
 const int target_altitude = 20000;
@@ -50,10 +49,7 @@ rec.time.setUTC(UTC_Time);
     nError = 1;
     Serial.println("GPS failed to initialize");
   }
-  if(!fruityMcFruitFace.begin()){
-    nError = 2;
-    Serial.println("Power Sensor failed to initialize");
-  }
+  
 }
 
 void loop() {
