@@ -3,14 +3,19 @@
 #include "Clock.h"
 #include "Data.h"
 #include "StabAlg.h"
-#include "String"
 #include <SHC_BME280.h>
-
+#include <SD.h>
+#include <SparkFun_u-blox_GNSS_Arduino_Library.h>
+#include <SHC_BNO055.h>
 
 // global object initalization
 Data rec;
 StabAlg stabilize;
 LED LED1(-1), LED2(-1);
+File file; 
+//    sensors
+SFE_UBLOX_GNSS hotMenInYourArea;
+BNO055 gayDar;
 
 // global variable intialization
 const int target_altitude = 20000;
@@ -37,6 +42,13 @@ Serial.begin(9600);
 Serial.println("Started!");
 rec.time.setUTC(UTC_Time);
 
+  if(!HotMenInYourArea.begin()){
+    nError = 1;
+    Serial.println("GPS failed to initialize");
+  }
+
+
+
 }
 
 void loop() {
@@ -52,7 +64,7 @@ void loop() {
     case 3:
       standby();
     default:
-      nError++;
+      nError = -1;
   }
 
 }
@@ -76,7 +88,7 @@ void standby(){
 
 
 void output(){
-  Serial.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
+  file.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
 }
 
 int stateCheck(){
