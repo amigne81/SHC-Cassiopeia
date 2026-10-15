@@ -15,7 +15,12 @@
 StabAlg::StabAlg(M9N men, BNO055 bro) {
     m9n = men;
     bno = bro;
+
     previousAngularPos=bno.getOrientationX();
+    if (previousAngularPos>180) {
+        previousAngularPos = previousAngularPos-360;
+    }
+
     previousTime=millis();
 }
 
@@ -25,6 +30,9 @@ StabAlg::StabAlg(M9N men, BNO055 bro) {
 long StabAlg::testRun() {
 
     angularPos = bno.getOrientationX();
+    if (angularPos>180) {
+        angularPos = angularPos-360;
+    }
 
     error = targetValue-angularPos;
 
@@ -56,6 +64,9 @@ long StabAlg::autoTargetRun(unsigned long millisecondUpdate) {
     }
 
     angularPos = bno.getOrientationX();
+    if (angularPos>180) {
+        angularPos = angularPos-360;
+    }
 
     error = targetValue-angularPos;
 
