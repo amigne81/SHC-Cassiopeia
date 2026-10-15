@@ -31,11 +31,16 @@ int Data::getDh(){
 	return Data::GPS.dz*1;
 }
 
-std::string Data::timeCSV(){
-	return std::to_string(Data::time.elapsedTime);
-}
+/*
+TEAM_ID, MISSION_TIME, UTC_TIME, PACKET_COUNT, 
+SW_STATE, ALTITUDE, TEMP, ACC_X, ACC_Y, ACC_Z, 
+GYRO_X, GYRO_Y, GYRO_Z, GPS_LAT, GPS_LONG, GPS_ALT 
+*/
 
-std::string Data::outCSV(){
-	return std::to_string(Data::GPS.getZ()) + "," + std::to_string(Data::temp) + "," + Data::Acc.outCSV() + 
+String Data::outCSV(){
+	Data::count++;
+	return String(Data::ID) + ", " + String(time.t()) + ", " + String(time.tUTC()) + ", " +
+	String(Data::count) + ", " + String(Data::GPS.getZ()) + "," + String(Data::temp) + "," +
+	String(Data::state)+ ", " + String(Data::temp) + Data::Acc.outCSV() + ", " + 
 	Data::Gyro.outCSV() + Data::GPS.outCSV();
 }

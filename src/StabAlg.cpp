@@ -1,9 +1,26 @@
 
+//orientation -> position
+//gyroscope -> velocity
+//acceleration -> ...
+
+//orientation x -> yaw
+//orientation y -> pitch
+//orientation z -> roll
+
 #include "Arduino.h"
 #include "StabAlg.h"
+#include "SHC_M9N.h"
+#include "SHC_BNO055.h"
 
-StabAlg::StabAlg(double firstAngularPos) {
-    previousAngularPos=firstAngularPos;
+StabAlg::StabAlg(M9N men, BNO055 bro) {
+    m9n = men;
+    bno = bro;
+
+    previousAngularPos=bno.getOrientationX();
+    if (previousAngularPos>180) {
+        previousAngularPos = previousAngularPos-360;
+    }
+
     previousTime=millis();
 }
 
@@ -12,13 +29,17 @@ StabAlg::StabAlg(double firstAngularPos) {
 //This method is where you can adjust the targetValue
 long StabAlg::testRun() {
 
-    angularPos = BNO.getOrientationX();
+    angularPos = bno.getOrientationX();
+    if (angularPos>180) {
+        angularPos = angularPos-360;
+    }
 
     error = targetValue-angularPos;
 
     unsigned long currTime = millis();
 
     derivative = (angularPos-previousAngularPos)/(currTime-previousTime);//also known as the angular velocity
+    //derivative = bno.getGyroX;//OR we can do this??
     previousAngularPos = angularPos;
     previousTime = currTime;
 
@@ -42,13 +63,16 @@ long StabAlg::autoTargetRun(unsigned long millisecondUpdate) {
         timeGoneBy = 0;
     }
 
-    angularPos = BNO.getOrientationX();
+    angularPos = bno.getOrientationX();
+    if (angularPos>180) {
+        angularPos = angularPos-360;
+    }
 
     error = targetValue-angularPos;
 
-    unsigned long currTime = millis();
+    unsigned long currTime = millis();//note: this is in milliseconds
 
-    derivative = (angularPos-previousAngularPos)/(currTime - previousTime);//also known as the angular velocity
+    derivative = (angularPos-previousAngularPos)/((currTime - previousTime)/1000);//also known as the angular velocity, deg/s
     previousAngularPos = angularPos;
     unsigned long k = previousTime;
     previousTime = currTime;
@@ -67,13 +91,13 @@ long StabAlg::autoTargetRun(unsigned long millisecondUpdate) {
     return CLOCKFOOL;//thrusters don't turn on
 }
 
-//NOTE: THE BELOW CODE IS SET TO RUN ON 10/25/26. FOR TESTING, MAY NEED TO ADJUST VALUES
+//Note: The math below runs well enough -Alexander
 double StabAlg::findNewTarget() {
     int day = 298;//october 25th, 2026 (not a leap year); launch day
-    int hour = M9N.getHour();
-    int min = M9N.getMinute();
-    double latitude = M9N.getLatitude();//degrees
-    double longitude = M9N.getLongitude();//degrees
+    int hour = m9n.getHour();
+    int min = m9n.getMinute();
+    double latitude = m9n.getLatitude();//degrees
+    double longitude = m9n.getLongitude();//degrees
     int GHT = -5;//Central Daylight Time
 
     double latitudeRad = latitude * PI / 180.0;
