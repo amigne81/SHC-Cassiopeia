@@ -27,10 +27,7 @@ int store3D::getZ(){
 	return z;
 }
 
-std::string store3D::outCSV(){
-	return std::to_string(x) + ", " + std::to_string(y) +", " + std::to_string(z)+ ", ";
+String store3D::outCSV(){
+	return String(x) + ", " + String(y) + ", " + (z)+ ", ";
 }
 
-std::string store3D::outdCSV(){
-	return std::to_string(store3D::dx) + ", " + std::to_string(store3D::dy) + ", " + std::to_string(store3D::dz) +", ";
-} 

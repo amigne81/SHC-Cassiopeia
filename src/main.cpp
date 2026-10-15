@@ -3,7 +3,7 @@
 #include "Clock.h"
 #include "Data.h"
 #include "StabAlg.h"
-#include "string"
+#include "String"
 #include <SHC_BME280.h>
 
 
@@ -16,7 +16,7 @@ LED LED1(-1), LED2(-1);
 const int target_altitude = 20000;
 const int standby_thresh = 1;
 const int standby_exit_mod = 8; 
-const int emergency_standby_exit= 5000;
+const int emergency_standby_exit= 5000; // time to exit if in target alt while in standby state (milliseconds)
 const unsigned long int UTC_Time;
 int nError = 0;
 
@@ -76,7 +76,7 @@ void standby(){
 
 
 void output(){
-  //Serial.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
+  Serial.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
 }
 
 int stateCheck(){
@@ -122,5 +122,9 @@ int stateCheck(){
       return i;
     }
   }
+
+}
+
+void setData(){
 
 }
