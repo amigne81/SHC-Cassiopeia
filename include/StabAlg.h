@@ -4,28 +4,28 @@
 #include "SHC_M9N.h"
 #include "SHC_BNO055.h"
 
-#include "Arduino.h";
+#include "Arduino.h"
 
 enum StabbingDirection {
     CLOCKWISE=1,
     COUNTERCLOCKWISE=-1,
     CLOCKFOOL=0,//thrusters don't turn on
-};
+    };
 
 
 class StabAlg {
 
     public:
 
-    StabAlg(M9N, BNO055);
+    StabAlg(SFE_UBLOX_GNSS, BNO055);
+    StabAlg(BNO055 bro);//USED FOR TESTING
 
-    M9N m9n;
+    SFE_UBLOX_GNSS m9n;
     BNO055 bno;
 
-    long testRun();//returns 1-> GO CLOCK; -1-> GO COUNTER; 0-> DO NOTHING
-    long autoTargetRun(unsigned long);//similar to testRun, just auto changes the targetValue every inputted milliseconds
+    int testRun();//returns 1-> GO CLOCK; -1-> GO COUNTER; 0-> DO NOTHING
+    int autoTargetRun(unsigned long);//similar to testRun, just auto changes the targetValue every inputted minutes
 
-    void setAngularPos(double);
     void setTargetValue(double);
     double getAngularPos();
     double getTargetValue();
@@ -38,16 +38,18 @@ class StabAlg {
     void setDeadband(double);
     double getDeadband();
 
+    double findNewTarget();//this should be private
+
     private://************PRIVATE**************
 
-    double findNewTarget();
+    //double findNewTarget();
 
-    long timeGoneBy;//milliseconds
+    double timeGoneBy=0;//minutes
 
-    double previousAngularPos;//degrees
     unsigned long previousTime;//milliseconds
     double angularPos;//degrees
     double targetValue=0;//default: true north
+    double previousError;
 
     double output;
     double error;//degrees
