@@ -53,6 +53,7 @@ rec.time.setUTC(UTC_Time);
 }
 
 void loop() {
+  
   rec.state = stateCheck();
 
   switch(rec.state){
