@@ -14,44 +14,21 @@ BNO055 ghj = BNO055();
 //StabAlg stab = StabAlg(m9n, bno);
 StabAlg stab = StabAlg(ghj);
 
-void setup() {//I'm pretty sure I was supposed to make a seperate testing environment? Hopefully this is ok...
-    //stuff, like Wire.begin(), pinMode, Sereal.begin(9600), ...
+void setup() {
     Wire.begin();
     Serial.begin(9600);
 
-    ghj.init();
-    
+    ghj.init();//bno
 }
 
 void loop() {
-
-    
     ghj.prefetchData();
-//     Serial.print("Accel: (" + String(ghj.getAccelerationX()));
-//   Serial.print(", " + String(ghj.getAccelerationY()));
-//   Serial.println(", " + String(ghj.getAccelerationZ()) + ")");
-//   Serial.print("Gyro: (" + String(ghj.getGyroX()));
-//   Serial.print(", " + String(ghj.getGyroY()));
-//   Serial.println(", " + String(ghj.getGyroZ()) + ")");
-  Serial.print("Orient: (" + String(ghj.getOrientationX()));
-//   Serial.print(", " + String(ghj.getOrientationY()));
-//   Serial.println(", " + String(ghj.getOrientationZ()) + ")");
-    // delay(1000);
 
-    // Serial.println(stab.testRun());
+    solenoidsAlg();
+}
 
-    // digitalWrite(3, HIGH);
-    // delay(100);
-    // digitalWrite(3, LOW);
-
-    // digitalWrite(4, HIGH);
-    // delay(100);
-    // digitalWrite(4, LOW);
-
-    //Serial.println("running?");
-
-
-    //Testing Solenoids
+void solenoidsAlg() {
+    //Running the test to see if the payload spins correctly
     int instruction = stab.testRun();
 
     if (instruction==CLOCKWISE) {//turn on 'right' solenoid???
@@ -65,7 +42,7 @@ void loop() {
         Serial.println("counter");
     }
     else if (instruction==2) {
-
+        //do nothing
     }
     else {//instruction==CLOCKFOOL -> turn everything off
         digitalWrite(3, LOW);
@@ -75,31 +52,45 @@ void loop() {
 
     Serial.println(stab.getAngularPos());
 
-    delay(5);
-    
-
-
-    // //Testing Target Value
-    // Serial.print("Target value: ");
-    // Serial.println(stab.findNewTarget());
-
-    // Serial.println("\n Dirrection: ");
-    // Serial.println(stab.testRun());
-
-    // Serial.println("\n Hour: ");
-    // Serial.println(m9n.getHour());
-
-    // Serial.println("\n Minute: ");
-    // Serial.println(m9n.getMinute());
+    delay(50);//for testing, we will use delay. For the flight code, don't
 }
 
+void testSolenoids() {
+    delay(1000);
 
-void Stabinit() {
+    digitalWrite(3, HIGH);
+    delay(100);
+    digitalWrite(3, LOW);
 
-
+    digitalWrite(4, HIGH);
+    delay(100);
+    digitalWrite(4, LOW);
 }
 
-void Stabtest() {
+void testTargetValueInfo() {
+    //Testing Target Value
+    Serial.print("Target value: ");
+    Serial.println(stab.findNewTarget());
 
+    Serial.println("\n Dirrection: ");
+    Serial.println(stab.testRun());
 
+    Serial.println("\n Hour: ");
+    Serial.println(m9n.getHour());
+
+    Serial.println("\n Minute: ");
+    Serial.println(m9n.getMinute());
+}
+
+void testOrientation() {
+
+    //   Serial.print("Accel: (" + String(ghj.getAccelerationX()));
+    //   Serial.print(", " + String(ghj.getAccelerationY()));
+    //   Serial.println(", " + String(ghj.getAccelerationZ()) + ")");
+    //   Serial.print("Gyro: (" + String(ghj.getGyroX()));
+    //   Serial.print(", " + String(ghj.getGyroY()));
+    //   Serial.println(", " + String(ghj.getGyroZ()) + ")");
+      Serial.print("Orient: (" + String(ghj.getOrientationX()));
+    //   Serial.print(", " + String(ghj.getOrientationY()));
+    //   Serial.println(", " + String(ghj.getOrientationZ()) + ")");
 }

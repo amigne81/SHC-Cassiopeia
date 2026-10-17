@@ -42,7 +42,7 @@ class StabAlg {
 
     private://************PRIVATE**************
 
-    //double findNewTarget();
+    // double findNewTarget();
 
     double timeGoneBy=0;//minutes
 
@@ -56,8 +56,12 @@ class StabAlg {
     double derivative;//degrees per second
 
     //K values can be adjusted to anything you want
-    double Kp=1;
-    double Kd=1;
+    double Kp=1.5;//experimental value
+    double Kd=1;//experimental value
+
+    //NOTE: below will not be used in delay() bc Aerin
+    double currDelayTime;//
+    double delayTimeMillis=50;//
 
     double deadband=15;//degrees, default value from the bible
 

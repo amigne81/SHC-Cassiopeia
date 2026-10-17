@@ -12,6 +12,7 @@
 //orientation X -> yaw
 //orientation Y -> pitch
 //orientation Z -> roll
+//for some reason, nothing changes????
 
 #include "Arduino.h"
 #include "StabAlg.h"
@@ -22,9 +23,7 @@ StabAlg::StabAlg(BNO055 bro) {//SFE_UBLOX_GNSS men, BNO055 bro
     //m9n = men;
     bno = bro;
 
-    double previousAngularPos = bno.getOrientationX();
-    // double previousAngularPos = 340;//remove after testing
-    // angularPos = 180;//remove after testing
+    double previousAngularPos = bno.getOrientationX();//Sam? Do I need to run bno.prefetchData()?
 
     previousError = previousAngularPos-targetValue;
     if (previousError>180) {
@@ -37,42 +36,47 @@ StabAlg::StabAlg(BNO055 bro) {//SFE_UBLOX_GNSS men, BNO055 bro
     previousTime=millis();
 }
 
-//is there is an error, check for missing pre-fetch.
-//if you don't know what that is, ask Sam :D
-//This method is where you can adjust the targetValue
+
+//This method is where the target value stays constant. Perfect for testing
 int StabAlg::testRun() {
 
+        //This prevents a division by zero when calculating derivative term
     unsigned long currTime = millis();
-    if (currTime==previousTime) {//I truly don't believe this will ever execute, but I don't want to risk it
-        Serial.println("Please don't");
-        return 2;//enough time hasn't gone by for any changes, so thrusters will not turn on
-        
+    if (currTime==previousTime) {
+        return NOTHING;//enough time hasn't gone by for any changes, so thrusters will not turn on
     }
-    bno.prefetchData();
+
+        //Setting up the angularPos and the error term
+    bno.prefetchData();//Sam??? Do I need this here???
     angularPos = bno.getOrientationX();
 
     error = angularPos-targetValue;
+    //Fixing the wraparound problem:
     if (error>180) {
         error = error-360;
     }
     else if (error<-180) {
         error = error+360;
-    }//fixing wraparound problem
+    }
 
+        //Setting up the derivative term
     double deltaDer = error-previousError;
+    //Fixing wraparound problem:
     if (deltaDer>180) {
         deltaDer = deltaDer-360;
     }
     else if (deltaDer<-180) {
         deltaDer = deltaDer+360;
-    }//fixing wraparound problem
+    }
     derivative = ((deltaDer)/(currTime-previousTime))*1000;//using seconds, not milliseconds
 
     previousError = error;
     previousTime = currTime;
 
+        //Setting up the control system PD
     output = (Kp * error) + (Kd * derivative);
 
+        //Bang-Bang
     //thruster direction output
     if (output > deadband) {
         return COUNTERCLOCKWISE;
@@ -88,16 +92,18 @@ int StabAlg::testRun() {
 //As long as angularPos gets initalized, we are golden. If not, uh....
 int StabAlg::autoTargetRun(unsigned long minuteUpdate) {
 
+        //This prevents a division by zero when calculating derivative term
     unsigned long currTime = millis();
-    if (currTime==previousTime) {//I truly don't believe this will ever execute, but I don't want to risk it
-        return CLOCKFOOL;//enough time hasn't gone by for any changes, so thrusters will not turn on
+    if (currTime==previousTime) {//this prevents a division by zero when calculating derivative term
+        return NOTHING;//enough time hasn't gone by for any changes, so thrusters will not turn on
     }
 
+        //Checks to see if it is time to update the target
     if (timeGoneBy>=minuteUpdate) {
         targetValue = findNewTarget();
 
         //angularPos, in this case, would refer to the previous angularPos, as it hasn't updated yet
-        previousError = angularPos-targetValue;//adjsuing the previousError to prevent a sudden jump from target changing
+        previousError = angularPos-targetValue;//adjusting the previousError to prevent a sudden jump from target changing
         if (previousError>180) {
             previousError = previousError-360;
         }
@@ -105,31 +111,35 @@ int StabAlg::autoTargetRun(unsigned long minuteUpdate) {
             previousError = previousError+360;
         }//fixing wraparound problem
 
-        timeGoneBy = timeGoneBy- ((double) minuteUpdate);//leftover time
+        timeGoneBy = timeGoneBy - ((double) minuteUpdate);//leftover time
     }
 
+        //Setting up the angularPos and the error term
+    bno.prefetchData();//Sam??? Do I need this here?
     angularPos = bno.getOrientationX();
-
+    //Fixing wraparound problem
     error = angularPos-targetValue;
     if (error>180) {
         error = error-360;
     }
     else if (error<-180) {
         error = error+360;
-    }//fixing wraparound problem
+    }
 
-    
+        //Setting up the derivative term
     double deltaDer = error-previousError;
+    //Fixing wraparound problem
     if (deltaDer>180) {
         deltaDer = deltaDer-360;
     }
     else if (deltaDer<-180) {
         deltaDer = deltaDer+360;
-    }//fixing wraparound problem
+    }
     derivative = ((deltaDer)/(currTime-previousTime))*1000;//using seconds, not milliseconds
 
     previousError = error;
 
+        //Accounting for time gone by
     unsigned long k = previousTime;
     previousTime = currTime;
 
@@ -137,6 +147,7 @@ int StabAlg::autoTargetRun(unsigned long minuteUpdate) {
 
     timeGoneBy += (millis()-k)/60000.0;
 
+        //Bang-Bang
     //thruster direction output
     if (output > deadband) {
         return COUNTERCLOCKWISE;
@@ -150,14 +161,19 @@ int StabAlg::autoTargetRun(unsigned long minuteUpdate) {
 //Note: The math below runs well enough -Alexander
 double StabAlg::findNewTarget() {
     int day = 298;//october 25th, 2026 (not a leap year); launch day
-    //int hour = m9n.getHour();
-    //int min = m9n.getMinute();
-    int hour = 9;
-    int min = 30;
-    // double latitude = m9n.getLatitude();//degrees
-    // double longitude = m9n.getLongitude();//degrees
-    double latitude = 36.0669;
-    double longitude = -88.8179;
+
+    //testing values if the M9N does not work
+    // int hour = 9;//testing
+    // int min = 30;//testing
+    // double latitude = 36.0669;
+    // double longitude = -88.8179;
+
+    //actial values from the M9N
+    int hour = m9n.getHour();
+    int min = m9n.getMinute();
+    double latitude = m9n.getLatitude();//degrees
+    double longitude = m9n.getLongitude();//degrees
+    
     //int GHT = -5;//Central Daylight Time
     int GHT = 0;//the M9N uses UTC as its time zone :(
 
@@ -176,8 +192,7 @@ double StabAlg::findNewTarget() {
             + 0.001868 * cosFY
             - 0.032077 * sinFY
             - 0.014615 * cos2FY
-            - 0.040849 * sin2FY
-        );
+            - 0.040849 * sin2FY);
 
     double declinationRad =
           0.006918
