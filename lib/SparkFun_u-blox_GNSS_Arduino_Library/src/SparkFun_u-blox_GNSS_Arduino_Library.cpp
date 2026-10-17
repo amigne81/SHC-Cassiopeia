@@ -4633,6 +4633,7 @@ sfe_ublox_status_e SFE_UBLOX_GNSS::sendCommand(ubxPacket *outgoingUBX, uint16_t 
   calcChecksum(outgoingUBX); // Sets checksum A and B bytes of the packet
 
 #ifndef SFE_UBLOX_REDUCED_PROG_MEM
+
   if (_printDebug == true)
   {
     _debugSerial->print(F("\nSending: "));
@@ -4675,6 +4676,7 @@ sfe_ublox_status_e SFE_UBLOX_GNSS::sendCommand(ubxPacket *outgoingUBX, uint16_t 
       }
 #endif
       retVal = waitForACKResponse(outgoingUBX, outgoingUBX->cls, outgoingUBX->id, maxWait); // Wait for Ack response
+      Serial.println(retVal);
     }
     else
     {

@@ -36,13 +36,13 @@ void setup() {
 
   Serial.println("Adafruit INA260 Test");
 
-  if (!ina260.begin()) {
-    Serial.println("Couldn't find INA260 chip");
-    while (1);
-  }
-  Serial.println("Found INA260 chip");
+  // if (!ina260.begin()) {
+  //   Serial.println("Couldn't find INA260 chip");
+  //   while (1);
+  // }
+  // Serial.println("Found INA260 chip");
 
-  pinMode(LED_BUILTIN, OUTPUT);
+ // pinMode(LED_BUILTIN, OUTPUT);
  // Serial.begin(9600);
   BMEinit();
   GPSinit();
@@ -51,10 +51,10 @@ void setup() {
 
 //to test indiviudally comment out the ___test() and ___init() above
 void loop() {
-  //GPStest();
-  //Serial.println("\n");
-  //BNOtest();
-  //Serial.println("\n");
+  GPStest();
+  Serial.println("\n");
+  BNOtest();
+  Serial.println("\n");
   BMEtest();
   Serial.println("\n");
   delay(3000);
