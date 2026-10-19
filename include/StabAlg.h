@@ -10,6 +10,9 @@ enum StabbingDirection {
     CLOCKWISE=1,
     COUNTERCLOCKWISE=-1,
     CLOCKFOOL=0,//thrusters don't turn on
+    NOTHING=2,//used for errors, such as when there could be a division by zero
+    FORCECOUNTER=-3,
+    FORCEWISE=3,
     };
 
 
@@ -40,9 +43,14 @@ class StabAlg {
 
     double findNewTarget();//this should be private
 
+    void update();
+    void solenoidTranslate(int);
+
     private://************PRIVATE**************
 
     // double findNewTarget();
+
+    int updateCounter=0;
 
     double timeGoneBy=0;//minutes
 
@@ -60,10 +68,13 @@ class StabAlg {
     double Kd=1;//experimental value
 
     //NOTE: below will not be used in delay() bc Aerin
-    double currDelayTime;//
-    double delayTimeMillis=50;//
+    double delayTimeMillis=50;
 
     double deadband=15;//degrees, default value from the bible
+
+    int posStrike=0;
+    int negStrike=0;
+    int maxStrike=3;
 
 };//the devil, from the Bible
 
