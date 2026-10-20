@@ -1,6 +1,6 @@
 
 #include "Data.h"
-#include "store3D.h"
+
 
 
 int Data::getTemp(){

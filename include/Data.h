@@ -2,13 +2,15 @@
 #ifndef Data_h
 #define Data_h
 
-#include "store3D.h"
+#include "store3Dlong.h"
+#include "store3Ddouble.h"
 #include "Clock.h"
 #include "Arduino.h"
 
 struct Data{
 	public:
-	store3D Acc, Gyro, GPS;
+	store3Ddouble Acc, Gyro;
+	store3Dlong GPS;
 	Clock time;
 	int temp;
 	int state;

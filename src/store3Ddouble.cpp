@@ -29,6 +29,6 @@ double store3Ddouble::getZ(){
 }
 
 String store3Ddouble::outCSV(){
-	return String(x) + ", " + String(y) + ", " + String(z)+ ", ";
+	return String(x,l) + ", " + String(y,l) + ", " + String(z,l)+ ", ";
 }
 

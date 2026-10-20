@@ -1,10 +1,11 @@
 
-#ifndef store3D_h
-#define store3D_h
+#ifndef store3Dlong_h
+#define store3Dlong_h
 #include "Arduino.h"
 
-class store3D{
+class store3Dlong{
 	private:
+	const int l = 5;
 	long  x,y,z;
 	public:
 	long dx=0 ,dy=0, dz=0; // change in direction variables
