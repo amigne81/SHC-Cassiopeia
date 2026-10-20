@@ -9,7 +9,7 @@
 
 struct Data{
 	public:
-	store3Ddouble Acc, Gyro, GPS;
+	store3Ddouble Acc, Gyro, GPS, bat;
 	Clock time;
 	int tempI, tempE, pressure, humidity;
 	int state;

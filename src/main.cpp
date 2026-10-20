@@ -39,6 +39,8 @@ bool erMen = true, erGay = true, erGuy = true, erDude = true, erPower = true;
 const unsigned long int tReq[3] = {20000,30000,60000};
 const int emergency_standby_exit= 5000; // time to exit if in target alt while in standby state (milliseconds)
 const int attempt_delay = 3; // delay between attempts of sensor initialization
+const int led_delay = 160;    // delay is between flashes, duration is the length of flashes
+const int led_duration = 40;
 
 // function declariation
 void below_target();
@@ -49,6 +51,7 @@ void output();
 void setData();
 void recSensors();
 void setupSensors();
+void blink();
 
 int stateCheck();
 
@@ -66,7 +69,6 @@ void setup() {
 
 void loop() {
   rec.time.setdt();
-
   rec.state = stateCheck();
 
   recSensors();
@@ -74,14 +76,19 @@ void loop() {
   switch(rec.state){
     case 0:
       below_target();
+      break;
     case 1:
       target_alt();
+      break;
     case 2:
       descent();
+      break;
     case 3:
       standby();
+      break;
     default:
       nError = -1;
+      break;
   }
 
   output();
@@ -137,6 +144,12 @@ void recSensors(){
   if(erDude){
     rec.tempE = dude.readTemperature();
     rec.pressure = dude.readPressure();
+  }
+
+  if(erPower){
+    rec.bat.setX(power.readBusVoltage());
+    rec.bat.setY(power.readCurrent());
+    rec.bat.setZ(power.readPower());
   }
 }
 
@@ -219,6 +232,23 @@ void setupSensors(){
   if(erMen){
   hotMenInYourArea.setI2COutput(COM_TYPE_UBX);
   hotMenInYourArea.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);
+  }
+}
+
+void blink(){
+  static int t;
+  t+=rec.time.dt;
+
+if(LED1.getState()){
+  if(t>led_duration){
+    LED1.off();
+    LED2.off();
+    t = 0;
+  } 
+}else if(t>led_delay){
+    LED1.on();
+    LED2.on();
+    t = 0;
   }
 }
 
