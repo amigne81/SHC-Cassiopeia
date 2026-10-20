@@ -5,31 +5,33 @@
 #include "Clock.h"
 #include "Data.h"
 #include "StabAlg.h"
-//#include <SparkFun_u-blox_GNSS_Arduino_Library.h>
+#include <SparkFun_u-blox_GNSS_Arduino_Library.h>
 #include <SHC_M9N.h>
-#include <SHC_BNO055.h>
+//#include <SHC_BNO055.h>
 #include <SHC_BME280.h>
 #include <Adafruit_BMP3XX.h>
 //#include <Adafruit_INA260.h>
 
-// global object initalization
-Data rec;
-StabAlg TheUK;
-LED LED1(-1), LED2(-1); 
 
 //    sensors
-M9N hotMenInYourArea;
+SFE_UBLOX_GNSS hotMenInYourArea;
 BNO055 gayDar;
 SHC_BME280 guy;
 Adafruit_BMP3XX dude;
 //Adafruit_INA260 power;
+
+// global object initalization
+Data rec;
+StabAlg TheUK = StabAlg(hotMenInYourArea, gayDar);
+LED LED1(-1), LED2(-1); 
+
 
 // global variable intialization
 const int target_altitude = 20000;
 const int standby_thresh = 1;
 const int standby_exit_mod = 8; 
 const int emergency_standby_exit= 5000; // time to exit if in target alt while in standby state (milliseconds)
-const unsigned long int UTC_Time;
+const unsigned long int UTC_Time = 0;
 int nError = 0;
 
 // time duration requiredments to switch states in milliseconds: to target alt, to descent, to standby
@@ -47,13 +49,15 @@ void recSensors();
 
 void setup() {
   Wire.begin();
+  Wire1.begin();
+
   Serial.begin(9600);
   Serial1.begin(9600);
   Serial.println("Program start\n");
   rec.time.setUTC(UTC_Time);
 
   // check status
-  while(hotMenInYourArea.init()!= NO_ERROR)
+  while(!hotMenInYourArea.begin())
     Serial.println("M9N not found     :(");
   while(gayDar.init()!= NO_ERROR)
     Serial.println("BN055 not found   >:(");
@@ -61,12 +65,16 @@ void setup() {
     Serial.println("BME280 not found  )=:");
   while(!dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1))
     Serial.println("BMP3 not found    :()");
+  Serial.println("Sensors Initlialized.");
 
   // sensor setup
   dude.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
   dude.setPressureOversampling(BMP3_OVERSAMPLING_4X);
   dude.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
   dude.setOutputDataRate(BMP3_ODR_50_HZ);
+
+  hotMenInYourArea.setI2COutput(COM_TYPE_UBX);
+  hotMenInYourArea.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);
 
 }
 
@@ -111,7 +119,6 @@ void standby(){
 }
 
 void fetch(){
-  hotMenInYourArea.prefetchData();
   gayDar.prefetchData();
   guy.prefetchData();
   dude.performReading();
@@ -184,7 +191,7 @@ int stateCheck(){
       return i;
     }
   }
-
+  return -1;
 }
 
 

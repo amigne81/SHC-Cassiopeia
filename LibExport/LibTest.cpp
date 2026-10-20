@@ -3,11 +3,6 @@
 #include <SHC_BME280.h>
 #include <SHC_M9N.h>
 
-
-#include <Adafruit_INA260.h>
-
-Adafruit_INA260 ina260 = Adafruit_INA260();
-
 /*
  * This is what the library was tested with. It runs all of the sensors on their default I2C addresses using the default pins and prints to Serial the data.  
  * The built in LED will blink if there is a wiring error and if the GPS is being tested, it will be on until a lock is achieved. 
@@ -30,23 +25,13 @@ void setup() {
 //starts i2c connection
   Wire.begin();  
 
+  pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(9600);
-  // Wait until serial port is opened
-  while (!Serial) { delay(10); }
 
-  Serial.println("Adafruit INA260 Test");
-
-  // if (!ina260.begin()) {
-  //   Serial.println("Couldn't find INA260 chip");
-  //   while (1);
-  // }
-  // Serial.println("Found INA260 chip");
-
- // pinMode(LED_BUILTIN, OUTPUT);
- // Serial.begin(9600);
-  BMEinit();
   GPSinit();
   BNOinit();
+  Serial.println("moments before catastrophe");
+  BMEinit();
 }
 
 //to test indiviudally comment out the ___test() and ___init() above
@@ -120,6 +105,7 @@ void BNOtest() {
 void BMEinit() {
   Serial.println(press.init());
   while (press.init() != NO_ERROR) {
+      Serial.println("it made it in it bno");
 
     digitalWrite(LED_BUILTIN, HIGH);
     delay(500);

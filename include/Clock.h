@@ -14,7 +14,7 @@ class Clock {
 	void setUTC(unsigned long int); 
 	unsigned long int t();
 	unsigned long int tUTC();
-	unsigned long int setdt();
+	void setdt();
 
 };
 

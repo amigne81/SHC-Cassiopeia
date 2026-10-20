@@ -12,20 +12,21 @@ struct Data{
 	store3Ddouble Acc, Gyro;
 	store3Dlong GPS;
 	Clock time;
-	int temp;
+	int tempI, tempE, pressure, humidity;
 	int state;
-	int ID = 123456789;
+	int ID = 1234;
 	int count = 0;
 
-	int getTemp();
-	int getAccX();
-	int getAccY();
-	int getAccZ();
-	int getGyroX();
-	int getGyroY();
-	int getGyroZ();
-	int getH();
-	int getDh();
+	int getTempI();
+	int getTempE();
+	double getAccX();
+	double getAccY();
+	double getAccZ();
+	double getGyroX();
+	double getGyroY();
+	double getGyroZ();
+	long getH();
+	long getDh();
 
 	String outCSV();
 };
