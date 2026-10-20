@@ -7,13 +7,12 @@
 class Clock {
 	private: 
 	unsigned long int previous = 0;
-	unsigned long int utc;
+	String utc;
 	
 	public:
 	unsigned long int dt;
-	void setUTC(unsigned long int); 
+	void setUTC(); 
 	unsigned long int t();
-	unsigned long int tUTC();
 	void setdt();
 
 };

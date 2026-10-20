@@ -1,17 +1,17 @@
 
-#include "Arduino.h"
+
 #include "Clock.h"
 
-void Clock::setUTC(unsigned long int a){
-	Clock::utc = a;
+void Clock::setUTC(SFE_UBLOX_GNSS* p){
+	
 }
 
 unsigned long int Clock::t(){
 	return millis();
 }
 
-unsigned long int Clock::tUTC(){
-	return millis() + Clock::utc;
+String Clock::UTC(){
+	return "";
 }
 
 void Clock::setdt(){

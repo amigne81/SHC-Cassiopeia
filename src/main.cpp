@@ -7,10 +7,9 @@
 #include "StabAlg.h"
 #include <SparkFun_u-blox_GNSS_Arduino_Library.h>
 #include <SHC_M9N.h>
-//#include <SHC_BNO055.h>
 #include <SHC_BME280.h>
 #include <Adafruit_BMP3XX.h>
-//#include <Adafruit_INA260.h>
+#include <Adafruit_INA260.h>
 
 
 //    sensors
@@ -18,6 +17,7 @@ SFE_UBLOX_GNSS hotMenInYourArea;
 BNO055 gayDar;
 SHC_BME280 guy;
 Adafruit_BMP3XX dude;
+Adafruit_INA260 power;
 //Adafruit_INA260 power;
 
 // global object initalization
@@ -27,12 +27,15 @@ LED LED1(-1), LED2(-1);
 
 
 // global variable intialization
+const int attempt_num = 100;
+const int attempt_delay = 3;
 const int target_altitude = 20000;
 const int standby_thresh = 1;
 const int standby_exit_mod = 8; 
 const int emergency_standby_exit= 5000; // time to exit if in target alt while in standby state (milliseconds)
-const unsigned long int UTC_Time = 0;
+
 int nError = 0;
+bool erMen = true, erGay = true, erGuy = true, erDude = true, erPower = true;
 
 // time duration requiredments to switch states in milliseconds: to target alt, to descent, to standby
 const unsigned long int tReq[3] = {20000,30000,60000};
@@ -46,6 +49,8 @@ void output();
 void setData();
 int stateCheck();
 void recSensors();
+void setupSensors();
+
 
 void setup() {
   Wire.begin();
@@ -54,27 +59,8 @@ void setup() {
   Serial.begin(9600);
   Serial1.begin(9600);
   Serial.println("Program start\n");
-  rec.time.setUTC(UTC_Time);
 
-  // check status
-  while(!hotMenInYourArea.begin())
-    Serial.println("M9N not found     :(");
-  while(gayDar.init()!= NO_ERROR)
-    Serial.println("BN055 not found   >:(");
-  while(guy.init()!= NO_ERROR)
-    Serial.println("BME280 not found  )=:");
-  while(!dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1))
-    Serial.println("BMP3 not found    :()");
-  Serial.println("Sensors Initlialized.");
-
-  // sensor setup
-  dude.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
-  dude.setPressureOversampling(BMP3_OVERSAMPLING_4X);
-  dude.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
-  dude.setOutputDataRate(BMP3_ODR_50_HZ);
-
-  hotMenInYourArea.setI2COutput(COM_TYPE_UBX);
-  hotMenInYourArea.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);
+  setupSensor();
 
 }
 
@@ -119,34 +105,120 @@ void standby(){
 }
 
 void fetch(){
-  gayDar.prefetchData();
-  guy.prefetchData();
-  dude.performReading();
+  if(erGay)  {gayDar.prefetchData();}
+  if(erGuy)  {guy.prefetchData();}
+  if(erDude) {dude.performReading();}
 }
 
 void recSensors(){
   fetch();
-  rec.GPS.setX(hotMenInYourArea.getLongitude());
-  rec.GPS.setY(hotMenInYourArea.getLatitude());
-  rec.GPS.setZ(hotMenInYourArea.getAltitude());
+  if(erMen){
+    rec.GPS.setX(hotMenInYourArea.getLongitude());
+    rec.GPS.setY(hotMenInYourArea.getLatitude());
+    rec.GPS.setZ(hotMenInYourArea.getAltitude());
+  }
 
-  rec.Gyro.setX(gayDar.getGyroX());
-  rec.Gyro.setY(gayDar.getGyroY());
-  rec.Gyro.setZ(gayDar.getGyroZ());
+  if(erGay){
+    rec.Gyro.setX(gayDar.getGyroX());
+    rec.Gyro.setY(gayDar.getGyroY());
+    rec.Gyro.setZ(gayDar.getGyroZ());
 
-  rec.Acc.setX(gayDar.getAccelerationX());
-  rec.Acc.setY(gayDar.getAccelerationY());
-  rec.Acc.setZ(gayDar.getAccelerationZ());
+    rec.Acc.setX(gayDar.getAccelerationX());
+    rec.Acc.setY(gayDar.getAccelerationY());
+    rec.Acc.setZ(gayDar.getAccelerationZ());
+  }
 
-  rec.tempI = guy.getTemperature();
-  rec.tempE = dude.readTemperature();
+  if(erGuy){
+    rec.tempI = guy.getTemperature();
+    rec.humidity = guy.getHumidity();
+  }
 
-  rec.pressure = dude.readPressure();
-  rec.humidity = guy.getHumidity();
+  if(erDude){
+    rec.tempE = dude.readTemperature();
+    rec.pressure = dude.readPressure();
+  }
 }
 
 void output(){
   Serial1.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
+}
+
+void setupSensor(){
+  // M9N
+  for(int i = 0; i <= attempt_num || hotMenInYourArea.begin(); i++){
+    Serial.println(" M9N not found     :(");
+    delay(attempt_delay);
+    if(i==attempt_num){
+      erMen = false;
+      Serial.println(" M9N failed to initialize.    IE1");
+      Serial1.print("M9N-1, ");
+    }
+  }
+
+  // BNO055
+  for(int i = 0; i<= attempt_num || gayDar.init()== NO_ERROR; i++){
+    Serial.println(" BNO055 not found   >:(");
+    delay(attempt_delay);
+    if(i==attempt_num){
+      erGay = false;
+      Serial.println(" BNO055 failed to initialize.  IE2");
+      Serial1.print("BNO055-1, ");
+    }
+  }
+
+  // BME280
+  for(int i = 0; i<= attempt_num || guy.init()== NO_ERROR; i++){
+    Serial.println(" BME280 not found  )=:");
+    delay(attempt_delay);
+    if(i==attempt_num){
+      erGuy = false;
+      Serial.println(" BME280 failed to initialize. IE3");
+      Serial1.print("BME280-1, ");
+    }
+  }
+
+  // BMP3
+  for(int i = 0; i<= attempt_num || dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1); i++){
+    Serial.println(" BMP3 not found    :()");
+    delay(attempt_delay);
+    if(i==attempt_num){
+      erDude = false;
+      Serial.println(" BMP3 failed to initialize.   IE4");
+      Serial1.print("BMP3-1, ");
+    }
+  }
+
+  // INA260
+  for(int i = 0; i<= attempt_num || power.begin(); i++){
+    Serial.println(" INA260 not found    :()");
+    delay(attempt_delay);
+    if(i==attempt_num){
+      erDude = false;
+      Serial.println(" INA260 failed to initialize. IE5");
+      Serial1.print("INA260-1, ");
+    }
+  }
+
+  Serial.println(" Sensors Initlialized: ."+
+    (erMen)? "\n  M9N":"" +
+    (erGay)? "\n  BNO055":"" +
+    (erGuy)? "\n  BME280":"" +
+    (erDude)? "\n  BMP3":"" +
+    (erPower)? "\n  INA260":"" +
+    (!(erMen|| erGay|| erGuy|| erDude || erPower))? "\n  None":""
+  );
+
+  // sensor config
+  if(erDude){
+  dude.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
+  dude.setPressureOversampling(BMP3_OVERSAMPLING_4X);
+  dude.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
+  dude.setOutputDataRate(BMP3_ODR_50_HZ);
+  }
+  if(erMen){
+  hotMenInYourArea.setI2COutput(COM_TYPE_UBX);
+  hotMenInYourArea.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);
+  }
 }
 
 int stateCheck(){
