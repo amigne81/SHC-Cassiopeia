@@ -25,6 +25,7 @@ Adafruit_INA260 power;
 Data rec;
 StabAlg TheUK = StabAlg(hotMenInYourArea, gayDar);
 LED LED1(-1), LED2(-1); 
+int buzzerPin = 5;
 
 
 // global variable intialization
@@ -65,6 +66,13 @@ void setup() {
 
   setupSensors();
   
+  if (erMen){
+    chirp(buzzerPin);
+    delay(500);    
+    chirp(buzzerPin);
+    delay(500);
+    chirp(buzzerPin);
+  }
 }
 
 void loop() {
@@ -250,6 +258,21 @@ if(LED1.getState()){
     LED2.on();
     t = 0;
   }
+}
+
+void chirp(int chripPin){
+  for(int i = 0; i < 400; i++){
+        digitalWrite(chirpPin,HIGH);
+        delayMicroseconds(i);
+        digitalWrite(chirpPin,LOW);
+        delayMicroseconds(i);
+    } 
+    for(int i = 400; i > 0; i--){
+        digitalWrite(chirpPin,HIGH);
+        delayMicroseconds(i);
+        digitalWrite(chirpPin,LOW);
+        delayMicroseconds(i);
+    } 
 }
 
 int stateCheck(){
