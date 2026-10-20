@@ -50,6 +50,7 @@ void setup() {
 }
 
 void loop() {
+  
   rec.state = stateCheck();
 
   switch(rec.state){

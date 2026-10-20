@@ -171,7 +171,7 @@
       */
       template< typename T > uint8_t &getData(const uint8_t addr,T &value)
       {
-        _I2CAddress = 0x77; //this fixes it somehow
+        //_I2CAddress = 0x77; //this fixes it somehow, the real problem is that its not assigning the I2C address
         uint8_t* bytePtr    = (uint8_t*)&value; // Pointer to structure beginning
         static uint8_t  structSize = sizeof(T); // Number of bytes in structure
         if (_I2CAddress) // If I2C address is non-zero then assume I2C bus
@@ -185,12 +185,15 @@
         }
         else // Otherwise use SPI bus
         {
+          Serial.println("HERE");
           if (_sck==0) // if sck is zero then hardware SPI
           {
+            Serial.println("HERE2");
             SPI.beginTransaction(SPISettings(SPI_HERTZ,MSBFIRST,SPI_MODE0));  // Start the SPI transaction
             digitalWrite(_cs, LOW);                                           // Tell BME280 to listen up
             SPI.transfer(addr | 0x80);                                        // bit 7 is high, so read a byte
-            for (uint8_t i=0;i<structSize;i++) *bytePtr++ = SPI.transfer(0);  // loop for each byte to be read
+            Serial.println(structSize);
+            for (uint8_t i=0;i<structSize;i++) *bytePtr++ = SPI.transfer(0);
             digitalWrite(_cs, HIGH);                                          // Tell BME280 to stop listening
             SPI.endTransaction();                                             // End the transaction
           } 

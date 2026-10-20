@@ -3,106 +3,237 @@
 //gyroscope -> velocity
 //acceleration -> ...
 
+//normally:
 //orientation x -> yaw
 //orientation y -> pitch
 //orientation z -> roll
 
+//but, because of how the bno is placed:
+//orientation X -> yaw
+//orientation Y -> pitch
+//orientation Z -> roll
+//for some reason, nothing changes????
+
 #include "Arduino.h"
 #include "StabAlg.h"
-#include "SHC_M9N.h"
+#include <SparkFun_u-blox_GNSS_Arduino_Library.h>//M9N
 #include "SHC_BNO055.h"
 
-StabAlg::StabAlg(M9N men, BNO055 bro) {
+StabAlg::StabAlg(SFE_UBLOX_GNSS men, BNO055 bro) {
     m9n = men;
     bno = bro;
 
-    previousAngularPos=bno.getOrientationX();
-    if (previousAngularPos>180) {
-        previousAngularPos = previousAngularPos-360;
+    double previousAngularPos = bno.getOrientationX();//Sam? Do I need to run bno.prefetchData()?
+
+    previousError = previousAngularPos-targetValue;
+    if (previousError>180) {
+        previousError = previousError-360;
     }
+    else if (previousError<-180) {
+        previousError = previousError+360;
+    }//fixing wraparound problem
 
     previousTime=millis();
 }
 
-//is there is an error, check for missing pre-fetch.
-//if you don't know what that is, ask Sam :D
-//This method is where you can adjust the targetValue
-long StabAlg::testRun() {
+void StabAlg::update() {
 
-    angularPos = bno.getOrientationX();
-    if (angularPos>180) {
-        angularPos = angularPos-360;
+    if(updateCounter==5) {
+        solenoidTranslate(testRun());
+        // solenoidTranslate(autoTargetRun(1));//the target value would change every 1 minute
+        updateCounter=0;
     }
 
-    error = targetValue-angularPos;
+    updateCounter++;
+}
 
+void StabAlg::solenoidTranslate(int instruction) {    
+    //Running the test to see if the payload spins correctly
+    Serial.println(instruction);
+
+    if (instruction==CLOCKWISE) {//turn on 'right' solenoid???
+        digitalWrite(3,LOW);
+        digitalWrite(4,HIGH);
+        Serial.println("clockwise");
+    }
+    else if (instruction==COUNTERCLOCKWISE) {//turn on 'left' solenoid???
+        digitalWrite(4, LOW);
+        digitalWrite(3, HIGH);
+        Serial.println("counter");
+    }
+    else if (instruction==NOTHING) {//do nothing. Even the solenoids aren't being turned off        
+        Serial.println("nothing");
+    }
+    else {//instruction==CLOCKFOOL -> turn everything off
+        digitalWrite(3, LOW);
+        digitalWrite(4, LOW);
+        Serial.println("fool");
+    }
+}
+
+
+//This method is where the target value stays constant. Perfect for testing
+int StabAlg::testRun() {
+
+        //This prevents a division by zero when calculating derivative term
     unsigned long currTime = millis();
+    //if (currTime>=previousTime+50) {//Delay Fix - Deadband Oscillation Problem WE ARE NOT DOING THIS
+    if (currTime==previousTime) {
+        return NOTHING;//enough time hasn't gone by for any changes, so thrusters will not turn on
+    }
 
-    derivative = (angularPos-previousAngularPos)/(currTime-previousTime);//also known as the angular velocity
-    //derivative = bno.getGyroX;//OR we can do this??
-    previousAngularPos = angularPos;
+        //Setting up the angularPos and the error term
+    bno.prefetchData();//Sam??? Do I need this here???
+    angularPos = bno.getOrientationX();
+
+    error = angularPos-targetValue;
+    //Fixing the wraparound problem:
+    if (error>180) {
+        error = error-360;
+    }
+    else if (error<-180) {
+        error = error+360;
+    }
+
+        //Setting up the derivative term
+    double deltaDer = error-previousError;
+    //Fixing wraparound problem:
+    if (deltaDer>180) {
+        deltaDer = deltaDer-360;
+    }
+    else if (deltaDer<-180) {
+        deltaDer = deltaDer+360;
+    }
+    derivative = ((deltaDer)/(currTime-previousTime))*1000;//using seconds, not milliseconds
+
+    previousError = error;
     previousTime = currTime;
 
+        //Setting up the control system PD
     output = (Kp * error) + (Kd * derivative);
 
+        //Three Strikes Fix - Deadband Oscillation Problem
+    // if (output < 16 && output > 14) {
+    //     posStrike++;
+    //     if (posStrike==maxStrike) {
+    //         return FORCECOUNTER;
+    //     }
+    // }
+    // else if (output < -14 && output > -16) {
+    //     negStrike++;
+    //     if (negStrike==maxStrike) {
+    //         return FORCEWISE;
+    //     }
+    // }
+    // else {
+    //     posStrike=0;
+    //     negStrike=0;
+    // }
+
+        //Bang-Bang
     //thruster direction output
     if (output > deadband) {
-        return CLOCKWISE;
+        return COUNTERCLOCKWISE;
     }
     else if (output < -deadband) {
-        return COUNTERCLOCKWISE;
+        return CLOCKWISE;
     }
     return CLOCKFOOL;//thrusters don't turn on
 }
 
 //This method below should be placed in loop() because of the variable timeGoneBy. May work improperly otherwise.
-long StabAlg::autoTargetRun(unsigned long millisecondUpdate) {
+//Note: The target will not change strictly at minuteUpdate minutes. This is fine.
+//As long as angularPos gets initalized, we are golden. If not, uh....
+int StabAlg::autoTargetRun(unsigned long minuteUpdate) {
 
-    if (timeGoneBy>=millisecondUpdate) {
+        //This prevents a division by zero when calculating derivative term
+    unsigned long currTime = millis();
+    if (currTime==previousTime) {//this prevents a division by zero when calculating derivative term
+        return NOTHING;//enough time hasn't gone by for any changes, so thrusters will not turn on
+    }
+
+        //Checks to see if it is time to update the target
+    if (timeGoneBy>=minuteUpdate) {
         targetValue = findNewTarget();
-        timeGoneBy = 0;
+
+        //angularPos, in this case, would refer to the previous angularPos, as it hasn't updated yet
+        previousError = angularPos-targetValue;//adjusting the previousError to prevent a sudden jump from target changing
+        if (previousError>180) {
+            previousError = previousError-360;
+        }
+        else if (previousError<-180) {
+            previousError = previousError+360;
+        }//fixing wraparound problem
+
+        timeGoneBy = timeGoneBy - ((double) minuteUpdate);//leftover time
     }
 
+        //Setting up the angularPos and the error term
+    bno.prefetchData();//Sam??? Do I need this here?
     angularPos = bno.getOrientationX();
-    if (angularPos>180) {
-        angularPos = angularPos-360;
+    //Fixing wraparound problem
+    error = angularPos-targetValue;
+    if (error>180) {
+        error = error-360;
+    }
+    else if (error<-180) {
+        error = error+360;
     }
 
-    error = targetValue-angularPos;
+        //Setting up the derivative term
+    double deltaDer = error-previousError;
+    //Fixing wraparound problem
+    if (deltaDer>180) {
+        deltaDer = deltaDer-360;
+    }
+    else if (deltaDer<-180) {
+        deltaDer = deltaDer+360;
+    }
+    derivative = ((deltaDer)/(currTime-previousTime))*1000;//using seconds, not milliseconds
 
-    unsigned long currTime = millis();//note: this is in milliseconds
+    previousError = error;
 
-    derivative = (angularPos-previousAngularPos)/((currTime - previousTime)/1000);//also known as the angular velocity, deg/s
-    previousAngularPos = angularPos;
+        //Accounting for time gone by
     unsigned long k = previousTime;
     previousTime = currTime;
 
     output = (Kp * error) + (Kd * derivative);
 
-    timeGoneBy += (millis()-k);
+    timeGoneBy += (millis()-k)/60000.0;
 
+        //Bang-Bang
     //thruster direction output
     if (output > deadband) {
-        return CLOCKWISE;
+        return COUNTERCLOCKWISE;
     }
     else if (output < -deadband) {
-        return COUNTERCLOCKWISE;
+        return CLOCKWISE;
     }
     return CLOCKFOOL;//thrusters don't turn on
 }
 
-//Note: The math below runs well enough -Alexander
+//Note: The math below runs accurately enough
 double StabAlg::findNewTarget() {
     int day = 298;//october 25th, 2026 (not a leap year); launch day
+
+    // testing values if the M9N does not work
+    // int hour = 9;
+    // int min = 30;
+    // double latitude = 36.0669;
+    // double longitude = -88.8179;
+
+    //actial values from the M9N
     int hour = m9n.getHour();
     int min = m9n.getMinute();
     double latitude = m9n.getLatitude();//degrees
     double longitude = m9n.getLongitude();//degrees
-    int GHT = -5;//Central Daylight Time
+    
+    //int GHT = -5;//Central Daylight Time
+    int GHT = 0;//the M9N uses UTC as its time zone :(
 
     double latitudeRad = latitude * PI / 180.0;
 
-    double fractionalYear = ( (2*PI)/365 ) * (day-1 + ( (hour-12)/24.0 ));
+    double fractionalYear = ( (2*PI)/365 ) * (day-1 + ( (hour-12)/24.0 ) + (min/1440));
 
     double cosFY = cos(fractionalYear);
     double sinFY = sin(fractionalYear);
@@ -115,8 +246,7 @@ double StabAlg::findNewTarget() {
             + 0.001868 * cosFY
             - 0.032077 * sinFY
             - 0.014615 * cos2FY
-            - 0.040849 * sin2FY
-        );
+            - 0.040849 * sin2FY);
 
     double declinationRad =
           0.006918

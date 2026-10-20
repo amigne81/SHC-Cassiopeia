@@ -4,28 +4,31 @@
 #include "SHC_M9N.h"
 #include "SHC_BNO055.h"
 
-#include "Arduino.h";
+#include "Arduino.h"
 
 enum StabbingDirection {
     CLOCKWISE=1,
     COUNTERCLOCKWISE=-1,
     CLOCKFOOL=0,//thrusters don't turn on
-};
+    NOTHING=2,//used for errors, such as when there could be a division by zero
+    FORCECOUNTER=-3,
+    FORCEWISE=3,
+    };
 
 
 class StabAlg {
 
     public:
 
-    StabAlg(M9N, BNO055);
+    StabAlg(SFE_UBLOX_GNSS, BNO055);
+    StabAlg(BNO055 bro);//USED FOR TESTING
 
-    M9N m9n;
+    SFE_UBLOX_GNSS m9n;
     BNO055 bno;
 
-    long testRun();//returns 1-> GO CLOCK; -1-> GO COUNTER; 0-> DO NOTHING
-    long autoTargetRun(unsigned long);//similar to testRun, just auto changes the targetValue every inputted milliseconds
+    int testRun();//returns 1-> GO CLOCK; -1-> GO COUNTER; 0-> DO NOTHING
+    int autoTargetRun(unsigned long);//similar to testRun, just auto changes the targetValue every inputted minutes
 
-    void setAngularPos(double);
     void setTargetValue(double);
     double getAngularPos();
     double getTargetValue();
@@ -38,26 +41,40 @@ class StabAlg {
     void setDeadband(double);
     double getDeadband();
 
+    double findNewTarget();//this should be private
+
+    void update();
+    void solenoidTranslate(int);
+
     private://************PRIVATE**************
 
-    double findNewTarget();
+    // double findNewTarget();
 
-    long timeGoneBy;//milliseconds
+    int updateCounter=0;
 
-    double previousAngularPos;//degrees
+    double timeGoneBy=0;//minutes
+
     unsigned long previousTime;//milliseconds
     double angularPos;//degrees
     double targetValue=0;//default: true north
+    double previousError;
 
     double output;
     double error;//degrees
     double derivative;//degrees per second
 
     //K values can be adjusted to anything you want
-    double Kp=1;
-    double Kd=1;
+    double Kp=1.5;//experimental value
+    double Kd=1;//experimental value
+
+    //NOTE: below will not be used in delay() bc Aerin
+    double delayTimeMillis=50;
 
     double deadband=15;//degrees, default value from the bible
+
+    int posStrike=0;
+    int negStrike=0;
+    int maxStrike=3;
 
 };//the devil, from the Bible
 
