@@ -5,7 +5,7 @@
 #include "Clock.h"
 #include "Data.h"
 #include "StabAlg.h"
-#include <SparkFun_u-blox_GNSS_Arduino_Library.h>
+//#include <SparkFun_u-blox_GNSS_Arduino_Library.h>
 #include <SHC_M9N.h>
 #include <SHC_BME280.h>
 #include <Adafruit_BMP3XX.h>
@@ -14,11 +14,12 @@
 
 //    sensors
 SFE_UBLOX_GNSS hotMenInYourArea;
+//M9N hotMenInYourArea;
 BNO055 gayDar;
 SHC_BME280 guy;
 Adafruit_BMP3XX dude;
 Adafruit_INA260 power;
-//Adafruit_INA260 power;
+
 
 // global object initalization
 Data rec;
@@ -27,18 +28,17 @@ LED LED1(-1), LED2(-1);
 
 
 // global variable intialization
-const int attempt_num = 100;
-const int attempt_delay = 3;
+const int attempt_num = 100;        // number of attempts made before giving up on sensor
 const int target_altitude = 20000;
 const int standby_thresh = 1;
 const int standby_exit_mod = 8; 
-const int emergency_standby_exit= 5000; // time to exit if in target alt while in standby state (milliseconds)
-
 int nError = 0;
 bool erMen = true, erGay = true, erGuy = true, erDude = true, erPower = true;
 
 // time duration requiredments to switch states in milliseconds: to target alt, to descent, to standby
 const unsigned long int tReq[3] = {20000,30000,60000};
+const int emergency_standby_exit= 5000; // time to exit if in target alt while in standby state (milliseconds)
+const int attempt_delay = 3; // delay between attempts of sensor initialization
 
 // function declariation
 void below_target();
@@ -47,10 +47,10 @@ void descent();
 void standby();
 void output();
 void setData();
-int stateCheck();
 void recSensors();
 void setupSensors();
 
+int stateCheck();
 
 void setup() {
   Wire.begin();
@@ -60,8 +60,8 @@ void setup() {
   Serial1.begin(9600);
   Serial.println("Program start\n");
 
-  setupSensor();
-
+  setupSensors();
+  
 }
 
 void loop() {
@@ -116,6 +116,7 @@ void recSensors(){
     rec.GPS.setX(hotMenInYourArea.getLongitude());
     rec.GPS.setY(hotMenInYourArea.getLatitude());
     rec.GPS.setZ(hotMenInYourArea.getAltitude());
+    rec.time.setUTC(&hotMenInYourArea);
   }
 
   if(erGay){
@@ -143,7 +144,7 @@ void output(){
   Serial1.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
 }
 
-void setupSensor(){
+void setupSensors(){
   // M9N
   for(int i = 0; i <= attempt_num || hotMenInYourArea.begin(); i++){
     Serial.println(" M9N not found     :(");

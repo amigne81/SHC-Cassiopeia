@@ -17,6 +17,7 @@
 #include "Arduino.h"
 #include "StabAlg.h"
 #include <SparkFun_u-blox_GNSS_Arduino_Library.h>//M9N
+#include <SHC_M9N.h>
 #include "SHC_BNO055.h"
 
 StabAlg::StabAlg(SFE_UBLOX_GNSS men, BNO055 bro) {

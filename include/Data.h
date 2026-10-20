@@ -9,13 +9,10 @@
 
 struct Data{
 	public:
-	store3Ddouble Acc, Gyro;
-	store3Dlong GPS;
+	store3Ddouble Acc, Gyro, GPS;
 	Clock time;
 	int tempI, tempE, pressure, humidity;
 	int state;
-	int ID = 1234;
-	int count = 0;
 
 	int getTempI();
 	int getTempE();
@@ -29,6 +26,11 @@ struct Data{
 	long getDh();
 
 	String outCSV();
+
+	private:
+	const int l = 5;
+	int ID = 1234;
+	int count = 0;
 };
 
 #endif
