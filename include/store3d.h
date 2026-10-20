@@ -1,7 +1,7 @@
 
 #ifndef store3D_h
 #define store3D_h
-#include "String"
+#include "Arduino.h"
 
 class store3D{
 	private:

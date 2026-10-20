@@ -4,7 +4,7 @@
 
 #include "store3D.h"
 #include "Clock.h"
-#include "string"
+#include "Arduino.h"
 
 struct Data{
 	public:
@@ -25,7 +25,7 @@ struct Data{
 	int getH();
 	int getDh();
 
-	std::string outCSV();
+	String outCSV();
 };
 
 #endif

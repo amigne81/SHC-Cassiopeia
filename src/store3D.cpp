@@ -28,6 +28,6 @@ int store3D::getZ(){
 }
 
 String store3D::outCSV(){
-	return String(x) + ", " + String(y) + ", " + (z)+ ", ";
+	return String(x) + ", " + String(y) + ", " + String(z)+ ", ";
 }
 

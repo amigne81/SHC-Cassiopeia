@@ -2,7 +2,7 @@
 #include "Arduino.h"
 #include "Clock.h"
 
-void Clock::setUTC(long int a){
+void Clock::setUTC(unsigned long int a){
 	Clock::utc = a;
 }
 
@@ -15,7 +15,7 @@ unsigned long int Clock::tUTC(){
 }
 
 unsigned long int Clock::dt(){
-	unsigned long int out = millis() - Clock::previous;
+	unsigned long int out = millis() - Clock::previous; 
 	previous = millis();
 	return out;
 }

@@ -10,8 +10,7 @@ class Clock {
 	unsigned long int utc;
 
 	public:
-	unsigned long int 
-	void setUTC(long unsigned int); 
+	void setUTC(unsigned long int); 
 	unsigned long int t();
 	unsigned long int tUTC();
 	unsigned long int dt();

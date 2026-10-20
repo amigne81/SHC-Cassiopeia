@@ -1,13 +1,14 @@
 #include <Arduino.h>
+#include <Utils.h>
 #include "LED.h"
 #include "Clock.h"
 #include "Data.h"
 #include "StabAlg.h"
-#include <SHC_BME280.h>
-#include <SparkFun_u-blox_GNSS_Arduino_Library.h>
+//#include <SparkFun_u-blox_GNSS_Arduino_Library.h>
+#include <SHC_M9N.h>
 #include <SHC_BNO055.h>
 #include <SHC_BME280.h>
-#include <Adafruit_INA260.h>
+//#include <Adafruit_INA260.h>
 
 // global object initalization
 Data rec;
@@ -15,10 +16,10 @@ StabAlg TheUK;
 LED LED1(-1), LED2(-1);
 
 //    sensors
-SFE_UBLOX_GNSS hotMenInYourArea;
+M9N hotMenInYourArea;
 BNO055 gayDar;
 SHC_BME280 grass;
-Adafruit_INA260 power;
+//Adafruit_INA260 power;
 
 // global variable intialization
 const int target_altitude = 20000;
@@ -41,14 +42,10 @@ void setData();
 int stateCheck();
 
 void setup() {
-Serial.begin(9600);
-Serial.println("Started!");
-rec.time.setUTC(UTC_Time);
-
-  if(!hotMenInYourArea.begin()){
-    nError = 1;
-    Serial.println("GPS failed to initialize");
-  }
+  Serial.begin(9600);
+  Serial1.begin(9600);
+  Serial.println("Program start\n");
+  rec.time.setUTC(UTC_Time);
   
 }
 
