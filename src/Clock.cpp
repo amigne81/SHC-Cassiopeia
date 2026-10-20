@@ -2,8 +2,8 @@
 
 #include "Clock.h"
 
-void Clock::setUTC(SFE_UBLOX_GNSS* p){
-	
+void Clock::setUTC(String a){
+	utc = a;
 }
 
 unsigned long int Clock::t(){
