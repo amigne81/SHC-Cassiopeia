@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Utils.h>
+#include <Wire.h>
 #include "LED.h"
 #include "Clock.h"
 #include "Data.h"
@@ -8,17 +9,19 @@
 #include <SHC_M9N.h>
 #include <SHC_BNO055.h>
 #include <SHC_BME280.h>
+#include <Adafruit_BMP3XX.h>
 //#include <Adafruit_INA260.h>
 
 // global object initalization
 Data rec;
 StabAlg TheUK;
-LED LED1(-1), LED2(-1);
+LED LED1(-1), LED2(-1); 
 
 //    sensors
 M9N hotMenInYourArea;
 BNO055 gayDar;
-SHC_BME280 grass;
+SHC_BME280 guy;
+Adafruit_BMP3XX dude;
 //Adafruit_INA260 power;
 
 // global variable intialization
@@ -40,18 +43,39 @@ void standby();
 void output();
 void setData();
 int stateCheck();
+void recSensors();
 
 void setup() {
+  Wire.begin();
   Serial.begin(9600);
   Serial1.begin(9600);
   Serial.println("Program start\n");
   rec.time.setUTC(UTC_Time);
-  
+
+  // check status
+  while(hotMenInYourArea.init()!= NO_ERROR)
+    Serial.println("M9N not found     :(");
+  while(gayDar.init()!= NO_ERROR)
+    Serial.println("BN055 not found   >:(");
+  while(guy.init()!= NO_ERROR)
+    Serial.println("BME280 not found  )=:");
+  while(!dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1))
+    Serial.println("BMP3 not found    :()");
+
+  // sensor setup
+  dude.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
+  dude.setPressureOversampling(BMP3_OVERSAMPLING_4X);
+  dude.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
+  dude.setOutputDataRate(BMP3_ODR_50_HZ);
+
 }
 
 void loop() {
-  
+  rec.time.setdt();
+
   rec.state = stateCheck();
+
+  recSensors();
 
   switch(rec.state){
     case 0:
@@ -65,6 +89,8 @@ void loop() {
     default:
       nError = -1;
   }
+
+  output();
 
 }
 
@@ -84,7 +110,33 @@ void standby(){
   
 }
 
+void fetch(){
+  hotMenInYourArea.prefetchData();
+  gayDar.prefetchData();
+  guy.prefetchData();
+  dude.performReading();
+}
 
+void recSensors(){
+  fetch();
+  rec.GPS.setX(hotMenInYourArea.getLongitude());
+  rec.GPS.setY(hotMenInYourArea.getLatitude());
+  rec.GPS.setZ(hotMenInYourArea.getAltitude());
+
+  rec.Gyro.setX(gayDar.getGyroX());
+  rec.Gyro.setY(gayDar.getGyroY());
+  rec.Gyro.setZ(gayDar.getGyroZ());
+
+  rec.Acc.setX(gayDar.getAccelerationX());
+  rec.Acc.setY(gayDar.getAccelerationY());
+  rec.Acc.setZ(gayDar.getAccelerationZ());
+
+  rec.tempI = guy.getTemperature();
+  rec.tempE = dude.readTemperature();
+
+  rec.pressure = dude.readPressure();
+  rec.humidity = guy.getHumidity();
+}
 
 void output(){
   Serial1.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
@@ -92,36 +144,35 @@ void output(){
 
 int stateCheck(){
   static unsigned long int dur[4];
-  unsigned long int dt = rec.time.dt();
   int dih = rec.getDh();
   int h = rec.getH();
   // checks values based on state: can move forward only one state at a time 
   switch(rec.state){
     case 0: // ascent to target alt
       if(h >= target_altitude){
-        dur[0] += dt;
+        dur[0] += rec.time.dt;
       }else{dur[0]=0; dur[1]=0; dur[2] = 0;}
 
     case 1: // target alt to descent
       if(dih<0){
-        dur[1]+= dt;
+        dur[1]+= rec.time.dt;
       }else if(h < target_altitude){  // revert chack to state ascent
         dur[1] = 0;
-        dur[0] += dt;
+        dur[0] += rec.time.dt;
       }else{dur[0]=0; dur[1]=0; dur[2] = 0;}
 
     case 2: // descent to standby
       if(dih > standby_thresh || dih < -standby_thresh){
-        dur[2] += dt;
+        dur[2] += rec.time.dt;
       }else if(dih<0){ // revert check to descent
-        dur[1] += dt;
-        if(dur[1] > dt*standby_exit_mod) // because negative dh could be higher than expected while in standby it must be continous for longer to reset progress towards standby
+        dur[1] += rec.time.dt;
+        if(dur[1] > rec.time.dt*standby_exit_mod) // because negative dh could be higher than expected while in standby it must be continous for longer to reset progress towards standby
           dur[2] = 0;
       }else{dur[0]=0; dur[1]=0; dur[2] = 0;}
 
     case 3: // standby operates seperate from others and only goes to target altitude
       if(h > target_altitude){
-        dur[3] += dt;
+        dur[3] += rec.time.dt;
       }else{dur[3]=0;}
       if(dur[3] >= emergency_standby_exit){
         return 1;
@@ -136,6 +187,5 @@ int stateCheck(){
 
 }
 
-void setData(){
 
-}
+// testing
