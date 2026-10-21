@@ -93,14 +93,6 @@ void setup() {
   delay(750);
   setupSensors();
 
-  if (erMen){
-    chirp(buzzerPin);
-    delay(500);    
-    chirp(buzzerPin);
-    delay(500);
-    chirp(buzzerPin);
-  }
-
   startTimeUK=millis();
 }
 
@@ -379,6 +371,7 @@ Serial.println(t);
 
 void setupSensors(){
   // M9N
+  LEDs.on();
   delay(500);
   for(int i = 0; (i<= attempt_num) && !(hotMenInYourArea.begin()); i++){
     Serial.println(" M9N not found     :(");
@@ -390,12 +383,18 @@ void setupSensors(){
     delay(attempt_delay);
   }
   if(erMen){
+  chirp(5);
   hotMenInYourArea.setI2COutput(COM_TYPE_UBX);
   hotMenInYourArea.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);
   }
-  
-Serial.println("M9N checked.");
+
+  delay(1500);
+  LEDs.off();
+  delay(3000);
+  LEDs.on();
   delay(500);
+
+Serial.println("M9N checked.");
   // BNO055 bad
   for(int i = 0; (i<= attempt_num) && (gayDar.init() == BNO_ERROR); i++){
     Serial.println(" BNO055 not found   >:(");
@@ -406,6 +405,15 @@ Serial.println("M9N checked.");
     }
     delay(attempt_delay);
   }
+
+  if(erGay){
+    chirp(5);
+  }
+
+  delay(1500);
+  LEDs.off();
+  delay(3000);
+  LEDs.on();
   delay(500);
 
   //BME280 (evil dastardly bad guy)
@@ -421,6 +429,16 @@ Serial.println("M9N checked.");
     }
     delay(attempt_delay);
   }
+
+  if(erGuy){
+    chirp(5);
+  }
+
+  delay(1500);
+  LEDs.off();
+  delay(3000);
+  LEDs.on();
+  delay(500);
 
   Serial.println("BME checked.");
   delay(500);
@@ -443,7 +461,14 @@ Serial.println("M9N checked.");
   dude.setPressureOversampling(BMP3_OVERSAMPLING_4X);
   dude.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
   dude.setOutputDataRate(BMP3_ODR_50_HZ);
+  chirp(5);
   }
+
+  delay(1500);
+  LEDs.off();
+  delay(3000);
+  LEDs.on();
+  delay(500);
 /*
   // INA260 also evil  bad never ever ever again
   power = Adafruit_INA260();
