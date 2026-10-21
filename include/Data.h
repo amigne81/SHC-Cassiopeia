@@ -29,7 +29,7 @@ struct Data{
 
 	private:
 	const int l = 5;
-	int ID = 1234;
+	String ID = "Cassiopia";
 	int count = 0;
 };
 
