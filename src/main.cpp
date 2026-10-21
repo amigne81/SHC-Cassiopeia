@@ -36,7 +36,7 @@ const int target_altitude = 20000;
 const int standby_thresh = 1;
 const int standby_exit_mod = 8; 
 int nError = 0;
-bool erMen = true, erGay = true, erGuy = true, erDude = true, erPower = true;
+bool erMen = true, erGay = true, erGuy = true, erDude = true;
 
 // time duration requiredments to switch states in milliseconds: to target alt, to descent, to standby
 const unsigned long int tReq[3] = {20000,30000,60000};
@@ -78,8 +78,6 @@ void outDude();
 int stateCheck();
 
 void setup() {
-
-
   Serial.begin(9600);
   delay(750);
   Serial.println("Program start0\n");
@@ -92,14 +90,6 @@ void setup() {
   Wire1.begin();
   delay(750);
   setupSensors();
-
-  if (erMen){
-    chirp(buzzerPin);
-    delay(500);    
-    chirp(buzzerPin);
-    delay(500);
-    chirp(buzzerPin);
-  }
 
   startTimeUK=millis();
 }
@@ -368,6 +358,8 @@ int stateCheck(){
 
 void setupSensors(){
   // M9N
+  LED1.on();
+  LED2.on();
   delay(500);
   for(int i = 0; (i< attempt_num) && !(hotMenInYourArea.begin()); i++){
     Serial.println(" M9N not found     :(");
@@ -381,9 +373,19 @@ void setupSensors(){
   if(erMen){
   hotMenInYourArea.setI2COutput(COM_TYPE_UBX);
   hotMenInYourArea.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);
+  chirp(5);
   }
+
+  LED1.off();
+  LED2.off();
   
 Serial.println("M9N checked.");
+
+delay(3000);
+
+  LED1.on();
+  LED2.on();
+
   delay(500);
   // BNO055 bad
   for(int i = 0; (i<= attempt_num) && (gayDar.init() == BNO_ERROR); i++){
@@ -395,8 +397,17 @@ Serial.println("M9N checked.");
     }
     delay(attempt_delay);
   }
-  delay(500);
+  if(erGay){
+    chirp(5);
+  }
 
+  LED1.off();
+  LED2.off(); 
+
+  delay(3000);
+
+  LED1.on();
+  LED2.on();
   //BME280 (evil dastardly bad guy)
   Serial.println("BNO checked.");
   for(int i = 0; (i<= attempt_num) && (guy.init() == BME_ERROR); i++){
@@ -410,9 +421,19 @@ Serial.println("M9N checked.");
     }
     delay(attempt_delay);
   }
-
+  
+  if(erGuy){
+    chirp(5);
+  }
+  LED1.off();
+  LED2.off();
   Serial.println("BME checked.");
-  delay(500);
+
+  delay(3000);
+  
+  LED1.on();
+  LED2.on();
+
   //BMP3 good boy
   for(int i = 0; (i<= attempt_num) && !(dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1)); i++){
     // Serial.print("the bmp is begingin? - ");
@@ -427,12 +448,17 @@ Serial.println("M9N checked.");
     }
     delay(attempt_delay);
   }
+
   if(erDude){
   dude.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
   dude.setPressureOversampling(BMP3_OVERSAMPLING_4X);
   dude.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
   dude.setOutputDataRate(BMP3_ODR_50_HZ);
+  chirp(5);
   }
+
+  LED1.off();
+  LED2.off();
 /*
   // INA260 also evil  bad never ever ever again
   power = Adafruit_INA260();
