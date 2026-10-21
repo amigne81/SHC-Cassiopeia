@@ -44,6 +44,7 @@ const int emergency_standby_exit= 5000; // time to exit if in target alt while i
 const int attempt_delay = 150; // delay between attempts of sensor initialization
 const int led_delay = 160;    // delay is between flashes, duration is the length of flashes
 const int led_duration = 40;
+const int standby_delay = 3000;
 
 unsigned long startTimeUK;
 
@@ -102,23 +103,23 @@ void loop() {
 
   recSensors();
   
-  blink();
 
   switch(rec.state){
     case 0:
       below_target();
+      blink();
       break;
     case 1:
       target_alt();
-      break;
     case 2:
       descent();
-      break;
     case 3:
       standby();
+      blink();
       break;
     default:
       nError = -1;
+      blink();
       break;
   }
 
@@ -146,7 +147,7 @@ void descent(){
 }
 
 void standby(){
-  
+  delay(standby_delay);
 }
 
 void fetch(){
@@ -188,9 +189,8 @@ void recSensors(){
 void output(){
   Serial1.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
   Serial.println(rec.outCSV()); // replace -1 w/ current time from rework clock function
-
+  Serial.println();
 }
-
 
 void blink(){
   static int t;
