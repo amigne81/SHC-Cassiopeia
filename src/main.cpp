@@ -21,7 +21,7 @@ Adafruit_BMP3XX dude = Adafruit_BMP3XX();
 
 // global object initalization
 Data rec;
-//StabAlg TheUK = StabAlg(hotMenInYourArea, gayDar);
+StabAlg TheUK = StabAlg(hotMenInYourArea, gayDar);
 LED LED1(-1), LED2(-1); 
 
 
@@ -75,24 +75,24 @@ void setup() {
   delay(750);
   Serial1.begin(9600);
   delay(750);
-  Serial.println("Program start\n");
+  Serial1.println("Program start\n");
   Wire.begin();
   delay(750);
   Wire1.begin();
   delay(750);
   setupSensors();
 
-  // if (erMen){
-  //   chirp(buzzerPin);
-  //   delay(500);    
-  //   chirp(buzzerPin);
-  //   delay(500);
-  //   chirp(buzzerPin);
-  // }
+  if (erMen){
+    chirp(buzzerPin);
+    delay(500);    
+    chirp(buzzerPin);
+    delay(500);
+    chirp(buzzerPin);
+  }
 }
 
 void loop() {
-  /*
+  
   rec.time.setdt();
   rec.state = stateCheck();
 
@@ -119,15 +119,15 @@ void loop() {
   }
 
   output();
-  */
+
 }
-/*
+
 void below_target(){
 
 }
 
 void target_alt(){
-  TheUK.update();
+  TheUK.update(10);
 }
 
 void descent(){
@@ -172,17 +172,12 @@ void recSensors(){
     rec.tempE = dude.readTemperature();
     rec.pressure = dude.readPressure();
   }
-  
-  if(erPower){
-    rec.bat.setX(power.readBusVoltage());
-    rec.bat.setY(power.readCurrent());
-    rec.bat.setZ(power.readPower());
-  }
-  
 }
 
 void output(){
   Serial1.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
+  Serial.println(rec.outCSV()); // replace -1 w/ current time from rework clock function
+
 }
 
 
@@ -319,7 +314,6 @@ int stateCheck(){
   }
   return -1;
 }
-*/
 
 void setupSensors(){
   // M9N
@@ -338,7 +332,7 @@ void setupSensors(){
   hotMenInYourArea.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);
   }
   
-Serial.println("a");
+Serial.println("M9N checked.");
   delay(500);
   // BNO055 bad
   for(int i = 0; (i<= attempt_num) && (gayDar.init() == BNO_ERROR); i++){
@@ -353,7 +347,7 @@ Serial.println("a");
   delay(500);
 
   //BME280 (evil dastardly bad guy)
-  Serial.println("b");
+  Serial.println("BNO checked.");
   for(int i = 0; (i<= attempt_num) && (guy.init() == BME_ERROR); i++){
     Serial.println(" BME280 not found  )=:");
     delay(100);
@@ -366,7 +360,7 @@ Serial.println("a");
     delay(attempt_delay);
   }
 
-Serial.println("c");
+  Serial.println("BME checked.");
   delay(500);
   //BMP3 good boy
   for(int i = 0; (i<= attempt_num) && !(dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1)); i++){
@@ -409,8 +403,5 @@ Serial.println("d");
   if(erDude){Serial.println("\n  BMP3");}
   if(!(erMen|| erGay|| erGuy|| erDude)){Serial.println("\n  None");}
   
-
-  // sensor config
-  Serial.println("e");
  
 }
