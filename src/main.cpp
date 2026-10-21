@@ -42,7 +42,7 @@ bool erMen = true, erGay = true, erGuy = true, erDude = true, erPower = true;
 const unsigned long int tReq[3] = {20000,30000,60000};
 const int emergency_standby_exit= 5000; // time to exit if in target alt while in standby state (milliseconds)
 const int attempt_delay = 150; // delay between attempts of sensor initialization
-const int led_delay = 460;    // delay is between flashes, duration is the length of flashes
+const int led_delay = 660;    // delay is between flashes, duration is the length of flashes
 const int led_duration = 40;
 const int standby_delay = 3000;
 
@@ -321,12 +321,15 @@ int stateCheck(){
   static unsigned long int dur[4];
   //int dih = rec.getDh();
   //int h = rec.getH();
+
+  // testing --------------------------------------
   long t = millis();
   static long h;
   long dih = h;
 
   h = -(77/56)*(t/1000)*((t/1000)-300);
   dih = (h-dih)/2;
+// -----------------------------------------------------
 
 Serial.print("h:     ");
 Serial.println(h);
@@ -371,13 +374,13 @@ Serial.println(t);
       return i;
     }
   }
-  return -1;
+  return 0;
 }
 
 void setupSensors(){
   // M9N
   delay(500);
-  for(int i = 0; (i< attempt_num) && !(hotMenInYourArea.begin()); i++){
+  for(int i = 0; (i<= attempt_num) && !(hotMenInYourArea.begin()); i++){
     Serial.println(" M9N not found     :(");
     if(i==attempt_num){
       erMen = false;
