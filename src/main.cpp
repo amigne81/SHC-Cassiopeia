@@ -5,31 +5,31 @@
 #include "Clock.h"
 #include "Data.h"
 #include "StabAlg.h"
-//#include <SparkFun_u-blox_GNSS_Arduino_Library.h>
-#include <SHC_M9N.h>
-//#include <SHC_BME280.h>
-#include <Adafruit_BME280.h>
+#include <SparkFun_u-blox_GNSS_Arduino_Library.h>
+//#include <SHC_M9N.h>
+#include <SHC_BME280.h>
 #include <Adafruit_BMP3XX.h>
-#include <Adafruit_INA260.h>
+//#include <Adafruit_INA260.h>
 
 //    sensors
 SFE_UBLOX_GNSS hotMenInYourArea;
 //M9N hotMenInYourArea;
 BNO055 gayDar;
-Adafruit_BME280 guy;
+SHC_BME280 guy;
 Adafruit_BMP3XX dude;
-Adafruit_INA260 power;
+//Adafruit_INA260 power;
 
 // global object initalization
 Data rec;
-StabAlg TheUK = StabAlg(hotMenInYourArea, gayDar);
+//StabAlg TheUK = StabAlg(hotMenInYourArea, gayDar);
 LED LED1(-1), LED2(-1); 
-int buzzerPin = 5;
+
 
 
 // global variable intialization
 const int solenoid_pin1 = 3;
 const int solenoid_pin2 = 4;
+const int buzzerPin = 5;
 
 const int attempt_num = 15;        // number of attempts made before giving up on sensor
 const int target_altitude = 20000;
@@ -41,7 +41,7 @@ bool erMen = true, erGay = true, erGuy = true, erDude = true, erPower = true;
 // time duration requiredments to switch states in milliseconds: to target alt, to descent, to standby
 const unsigned long int tReq[3] = {20000,30000,60000};
 const int emergency_standby_exit= 5000; // time to exit if in target alt while in standby state (milliseconds)
-const int attempt_delay = 3; // delay between attempts of sensor initialization
+const int attempt_delay = 50; // delay between attempts of sensor initialization
 const int led_delay = 160;    // delay is between flashes, duration is the length of flashes
 const int led_duration = 40;
 
@@ -67,29 +67,37 @@ void chirp(int);
 int stateCheck();
 
 void setup() {
-  Wire.begin();
-  Wire1.begin();
+
 
   Serial.begin(9600);
+  delay(750);
+  Serial.println("Program start0\n");
+  delay(750);
   Serial1.begin(9600);
+  delay(750);
   Serial.println("Program start\n");
-
+  Wire.begin();
+  delay(750);
+  Wire1.begin();
+  delay(750);
   setupSensors();
 
-  if (erMen){
-    chirp(buzzerPin);
-    delay(500);    
-    chirp(buzzerPin);
-    delay(500);
-    chirp(buzzerPin);
-  }
+  // if (erMen){
+  //   chirp(buzzerPin);
+  //   delay(500);    
+  //   chirp(buzzerPin);
+  //   delay(500);
+  //   chirp(buzzerPin);
+  // }
 }
 
 void loop() {
+  /*
   rec.time.setdt();
   rec.state = stateCheck();
 
   recSensors();
+  
   blink();
 
   switch(rec.state){
@@ -111,8 +119,9 @@ void loop() {
   }
 
   output();
+  */
 }
-
+/*
 void below_target(){
 
 }
@@ -131,7 +140,7 @@ void standby(){
 
 void fetch(){
   if(erGay)  {gayDar.prefetchData();}
-  //if(erGuy)  {guy.prefetchData();}
+  if(erGuy)  {guy.prefetchData();}
   if(erDude) {dude.performReading();}
 }
 
@@ -155,20 +164,21 @@ void recSensors(){
   }
 
   if(erGuy){
-    rec.tempI = guy.readTemperature();
-    rec.humidity = guy.readHumidity();
+    rec.tempI = guy.getTemperature();
+    rec.humidity = guy.getHumidity();
   }
 
   if(erDude){
     rec.tempE = dude.readTemperature();
     rec.pressure = dude.readPressure();
   }
-
+  /*
   if(erPower){
     rec.bat.setX(power.readBusVoltage());
     rec.bat.setY(power.readCurrent());
     rec.bat.setZ(power.readPower());
   }
+  
 }
 
 void output(){
@@ -270,7 +280,9 @@ if(LED1.getState()){
   } 
 }else if(t>led_delay){
     LED1.on();
-    LED2.on();
+    LED2.on(
+
+    );
     t = 0;
   }
 }
@@ -315,19 +327,6 @@ void testTargetValueInfo() {
 
     Serial.println("\n Minute: ");
     Serial.println(hotMenInYourArea.getMinute());
-}
-
-void testOrientation() {
-
-    //   Serial.print("Accel: (" + String(ghj.getAccelerationX()));
-    //   Serial.print(", " + String(ghj.getAccelerationY()));
-    //   Serial.println(", " + String(ghj.getAccelerationZ()) + ")");
-    //   Serial.print("Gyro: (" + String(ghj.getGyroX()));
-    //   Serial.print(", " + String(ghj.getGyroY()));
-    //   Serial.println(", " + String(ghj.getGyroZ()) + ")");
-    //*  Serial.print("Orient: (" + String(gayDar.getOrientationX()));
-    //   Serial.print(", " + String(ghj.getOrientationY()));
-    //   Serial.println(", " + String(ghj.getOrientationZ()) + ")");
 }
 
 void solenoidsTranslate(int instruction) {    
@@ -402,6 +401,106 @@ int stateCheck(){
   }
   return -1;
 }
+*/
 
+void setupSensors(){
+  // M9N
+
+  hotMenInYourArea = SFE_UBLOX_GNSS();
+  for(int i = 0; (i< attempt_num || !hotMenInYourArea.begin()); i++){
+    Serial.println(" M9N not found     :(");
+    if(i==attempt_num){
+      erMen = false;
+      Serial.println(" M9N failed to initialize.    IE1");
+      Serial1.print("M9N-1, ");
+    }
+    delay(attempt_delay);
+  }
+
+Serial.println("a");
+
+  // BNO055 bad
+  gayDar = BNO055();
+  for(int i = 0; i<= attempt_num || !gayDar.init()== NO_ERROR; i++){
+    Serial.println(" BNO055 not found   >:(");
+    if(i==attempt_num){
+      erGay = false;
+      Serial.println(" BNO055 failed to initialize.  IE2");
+      Serial1.print("BNO055-1, ");
+    }
+    delay(attempt_delay);
+  }
+
+
+  //BME280 (evil dastardly bad guy)
+  Serial.println("b");
+  guy = SHC_BME280();
+  for(int i = 0; i<= attempt_num || guy.init()== BME_ERROR; i++){
+    Serial.println(" BME280 not found  )=:");
+    Serial.println(String(guy.init()));
+    if(i==attempt_num){
+      erGuy = false;
+      Serial.println(" BME280 failed to initialize. IE3");
+      Serial1.print("BME280-1, ");
+    }
+
+    delay(attempt_delay);
+  }
+
+Serial.println("c");
+
+  //BMP3 good boy
+  for(int i = 0; i<= attempt_num && !dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1); i++){
+    // Serial.print("the bmp is begingin? - ");
+    // Serial.println(dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1));
+    // Serial.print("the attempt num is... ");
+    // Serial.println(i);
+    Serial.println(" BMP3 not found    :()");
+    if(i==attempt_num){
+      erDude = false;
+      Serial.println(" BMP3 failed to initialize.   IE4");
+      Serial1.print("BMP3-1, ");
+    }
+    delay(attempt_delay);
+  }
+
+/*
+  // INA260 also evil  bad never ever ever again
+  power = Adafruit_INA260();
+  for(int i = 0; (i<= attempt_num) || !power.begin(); i++){
+    Serial.println(" INA260 not found    :()");
+    if(i==attempt_num){
+      erDude = false;
+      Serial.println(" INA260 failed to initialize. IE5");
+      Serial1.print("INA260-1, ");
+    }
+    delay(attempt_delay);
+  }
+*/
+Serial.println("d");
+  Serial.println(" Sensors Initlialized: ."+
+    (erMen)? "\n  M9N":"" +
+    (erGay)? "\n  BNO055":"" +
+    (erGuy)? "\n  BME280":"" +
+    (erDude)? "\n  BMP3":"" +
+    (!(erMen|| erGay|| erGuy|| erDude))? "\n  None":""
+  );
+
+  // sensor config
+  Serial.println("e");
+  /*
+  if(erDude){
+  dude.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
+  dude.setPressureOversampling(BMP3_OVERSAMPLING_4X);
+  dude.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
+  dude.setOutputDataRate(BMP3_ODR_50_HZ);
+  }
+  if(erMen){
+  hotMenInYourArea.setI2COutput(COM_TYPE_UBX);
+  hotMenInYourArea.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);
+  }
+  */
+ Serial.println("f");
+}
 
 // testing
