@@ -66,6 +66,14 @@ void testTargetValueInfo();
 void testOrientation();
 void solenoidsTranslate(int);
 void chirp(int);
+void recMen();
+void outMen();
+void gayWreck();
+void outCloset();
+void recGuy();
+void outGuy();
+void recDude();
+void outDude();
 
 int stateCheck();
 
@@ -100,9 +108,7 @@ void loop() {
   
   rec.time.setdt();
   rec.state = stateCheck();
-
   recSensors();
-  
 
   switch(rec.state){
     case 0:
@@ -123,8 +129,10 @@ void loop() {
       break;
   }
 
-  output();
+  chirp(buzzerPin);
 
+  output();
+  // delay(5000) // for testing
 }
 
 void below_target(){
@@ -156,34 +164,66 @@ void fetch(){
   if(erDude) {dude.performReading();}
 }
 
+void recMen(){
+  rec.GPS.setX(hotMenInYourArea.getLongitude());
+  rec.GPS.setY(hotMenInYourArea.getLatitude());
+  rec.GPS.setZ(hotMenInYourArea.getAltitude());
+  rec.time.setUTC(&hotMenInYourArea);
+}
+
+void outMen(){
+  Serial.println("Longitude: "+ hotMenInYourArea.getLongitude());
+  Serial.println("Latitude: "+ hotMenInYourArea.getLatitude());
+  Serial.println("Altitude: "+ hotMenInYourArea.getAltitude());
+}
+
+void gayWreck(){
+  rec.Gyro.setX(gayDar.getGyroX());
+  rec.Gyro.setY(gayDar.getGyroY());
+  rec.Gyro.setZ(gayDar.getGyroZ());
+
+  rec.Acc.setX(gayDar.getAccelerationX());
+  rec.Acc.setY(gayDar.getAccelerationY());
+  rec.Acc.setZ(gayDar.getAccelerationZ());
+}
+
+void outCloset(){
+  Serial.println("Gyro X: " + int(gayDar.getGyroX()));
+  Serial.println("Gyro Y: " + int(gayDar.getGyroY()));
+  Serial.println("Gyro Z: " + int(gayDar.getGyroZ()));
+
+  Serial.println("Acc X: " + int(gayDar.getAccelerationX()));
+  Serial.println("Acc Y: " + int(gayDar.getAccelerationY()));
+  Serial.println("ACC Z: " + int(gayDar.getAccelerationZ()));
+}
+
+void recGuy(){
+  rec.tempI = guy.getTemperature();
+  rec.humidity = guy.getHumidity();
+}
+
+void outGuy(){
+  Serial.println("tempI: "+ String(guy.getTemperature(),5));
+  Serial.println("humid: "+ String(guy.getHumidity()));
+}
+
+void recDude(){
+  rec.tempE = dude.readTemperature();
+  rec.pressure = dude.readPressure();
+}
+
+void outDude(){
+  Serial.println("tempE: " + String(dude.readTemperature(),5));
+  Serial.println("presr: " + String(dude.readPressure(),5));
+}
+
 void recSensors(){
   fetch();
-  if(erMen){
-    rec.GPS.setX(hotMenInYourArea.getLongitude());
-    rec.GPS.setY(hotMenInYourArea.getLatitude());
-    rec.GPS.setZ(hotMenInYourArea.getAltitude());
-    rec.time.setUTC(&hotMenInYourArea);
-  }
 
-  if(erGay){
-    rec.Gyro.setX(gayDar.getGyroX());
-    rec.Gyro.setY(gayDar.getGyroY());
-    rec.Gyro.setZ(gayDar.getGyroZ());
-
-    rec.Acc.setX(gayDar.getAccelerationX());
-    rec.Acc.setY(gayDar.getAccelerationY());
-    rec.Acc.setZ(gayDar.getAccelerationZ());
-  }
-
-  if(erGuy){
-    rec.tempI = guy.getTemperature();
-    rec.humidity = guy.getHumidity();
-  }
-
-  if(erDude){
-    rec.tempE = dude.readTemperature();
-    rec.pressure = dude.readPressure();
-  }
+  //if(erMen){recMen();}
+  //if(erGay){gayWreck();}
+  //if(erGuy){recGuy();}
+  if(erDude){recDude();}
 }
 
 void output(){
