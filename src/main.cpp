@@ -188,7 +188,6 @@ void recSensors(){
 void output(){
   Serial1.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
   Serial.println(rec.outCSV()); // replace -1 w/ current time from rework clock function
-
 }
 
 
