@@ -49,7 +49,7 @@ int StabAlg::testRun() {
     bno.prefetchData();//Sam??? Do I need this here???
     angularPos = bno.getOrientationX();
 
-    error = angularPos-targetValue;
+    error = angularPos-(targetValue+30);
     //Fixing the wraparound problem:
     if (error>180) {
         error = error-360;
@@ -117,7 +117,7 @@ int StabAlg::autoTargetRun(double minuteUpdate) {
     bno.prefetchData();//Sam??? Do I need this here?
     angularPos = bno.getOrientationX();
     //Fixing wraparound problem
-    error = angularPos-targetValue;
+    error = angularPos-(targetValue+30);
     if (error>180) {
         error = error-360;
     }
