@@ -216,9 +216,9 @@ void outDude(){
 void recSensors(){
   fetch();
 
-  //if(erMen){recMen();}
-  //if(erGay){gayWreck();}
-  //if(erGuy){recGuy();}
+  if(erMen){recMen();}
+  if(erGay){gayWreck();}
+  if(erGuy){recGuy();}
   if(erDude){recDude();}
 }
 
