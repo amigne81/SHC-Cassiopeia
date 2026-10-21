@@ -45,6 +45,8 @@ const int attempt_delay = 150; // delay between attempts of sensor initializatio
 const int led_delay = 160;    // delay is between flashes, duration is the length of flashes
 const int led_duration = 40;
 
+unsigned long startTimeUK;
+
 // function declariation
 void below_target();
 void target_alt();
@@ -89,6 +91,8 @@ void setup() {
     delay(500);
     chirp(buzzerPin);
   }
+
+  startTimeUK=millis();
 }
 
 void loop() {
@@ -127,7 +131,14 @@ void below_target(){
 }
 
 void target_alt(){
-  TheUK.update(10);
+  unsigned long currTime=millis();
+
+
+  if(startTimeUK+25<=currTime) {
+    TheUK.update(10);
+    startTimeUK=millis();
+  }
+  //data collection goes here
 }
 
 void descent(){
