@@ -102,6 +102,11 @@ void loop() {
   rec.state = stateCheck();
   recSensors();
 
+  outMen();
+  outCloset();
+  outGuy();
+  outDude();
+
   switch(rec.state){
     case 0:
       below_target();
@@ -123,7 +128,7 @@ void loop() {
 
   Serial.print("state: ");
   Serial.println(rec.state);
-  //output();
+  output();
   // delay(5000) // for testing
 }
 
@@ -133,7 +138,6 @@ void below_target(){
 
 void target_alt(){
   unsigned long currTime=millis();
-
 
   if(startTimeUK+25<=currTime) {
     TheUK.update(10);
@@ -314,19 +318,19 @@ int stateCheck(){
   //int dih = rec.getDh();
   //int h = rec.getH();
 
-  // testing --------------------------------------
+  // testing -------------------------------------- this never went into landing stage bc it was continuously decrasing
   long t = millis();
   static long h;
   long dih = h;
 
-  h = -(77/56)*(t/1000)*((t/1000)-300);
-  dih = (h-dih)/2;
+  // h = -(77/56)*(t/1000)*((t/1000)-300);
+  // dih = (h-dih)/2;
 // -----------------------------------------------------
 
-Serial.print("h:     ");
-Serial.println(h);
-Serial.print("t:     ");
-Serial.println(t);
+// Serial.print("h:     ");
+// Serial.println(h);
+// Serial.print("t:     ");
+// Serial.println(t);
 
   // checks values based on state: can move forward only one state at a time 
   switch(rec.state){

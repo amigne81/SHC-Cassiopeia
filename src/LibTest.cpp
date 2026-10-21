@@ -1,7 +1,7 @@
 #include <SHC_BNO055.h>
 #include <Utils.h>
 #include <SHC_BME280.h>
-#include <SHC_M9N.h>
+//#include <SHC_M9N.h>
 
 /*
  * This is what the library was tested with. It runs all of the sensors on their default I2C addresses using the default pins and prints to Serial the data.  
@@ -10,7 +10,7 @@
  * With that in mind, comment out any sensor tests and inits for sensors you do not currently have connected. 
 */
 
-M9N gps = M9N();
+//M9N gps = M9N();
 BNO055 mybno = BNO055();
 SHC_BME280 press = SHC_BME280();
 
@@ -28,14 +28,14 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(9600);
 
-  GPSinit();
+  //GPSinit();
   BNOinit();
   BMEinit();
 }
 
 //to test indiviudally comment out the ___test() and ___init() above
 void loop() {
-  GPStest();
+  //GPStest();
   Serial.println("\n");
   BNOtest();
   Serial.println("\n");
@@ -46,34 +46,34 @@ void loop() {
 
 // Testing functions to make it easier to put into the setup and loop
 //init functions check if the sensor can be initalized
-void GPSinit() {
-  while (gps.init() != NO_ERROR) {
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(500);
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(500);
-    Serial.println("M9N Not Found");
-  }
-}
+// void GPSinit() {
+//   while (gps.init() != NO_ERROR) {
+//     digitalWrite(LED_BUILTIN, HIGH);
+//     delay(500);
+//     digitalWrite(LED_BUILTIN, LOW);
+//     delay(500);
+//     Serial.println("M9N Not Found");
+//   }
+// }
 
-void GPStest() {
-   long latitude = gps.getLatitude();
-    Serial.print(F("Lat: "));
-    Serial.print(latitude);
+// void GPStest() {
+//    long latitude = gps.getLatitude();
+//     Serial.print(F("Lat: "));
+//     Serial.print(latitude);
 
-    long longitude = gps.getLongitude();
-    Serial.print(F(" Long: "));
-    Serial.print(longitude);
-    Serial.print(F(" (degrees * 10^-7)"));
+//     long longitude = gps.getLongitude();
+//     Serial.print(F(" Long: "));
+//     Serial.print(longitude);
+//     Serial.print(F(" (degrees * 10^-7)"));
 
-    long altitude = gps.getAltitude();
-    Serial.print(F(" Alt: "));
-    Serial.print(altitude);
-    Serial.print(F(" (mm)"));
+//     long altitude = gps.getAltitude();
+//     Serial.print(F(" Alt: "));
+//     Serial.print(altitude);
+//     Serial.print(F(" (mm)"));
 
-    byte SIV = gps.getSIV();
-    Serial.print(F(" SIV: "));
-    Serial.print(SIV);
+//     byte SIV = gps.getSIV();
+//     Serial.print(F(" SIV: "));
+//     Serial.print(SIV);
   // gps.prefetchData();
   // if (gps.getSIV() < 3) {
   //   digitalWrite(LED_BUILTIN, HIGH);
@@ -93,7 +93,6 @@ void GPStest() {
   // Serial.println("SIV: " + String(gps.getSIV()));
   // Serial.println("UNIX: " + String(gps.getUnixTime()));
 
-}
 
 void BNOinit() {
   while (mybno.init() != NO_ERROR) {
