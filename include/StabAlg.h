@@ -1,7 +1,7 @@
 
 #ifndef StabAlg_h
 #define StabAlg_h
-#include "SHC_M9N.h"
+#include <SparkFun_u-blox_GNSS_Arduino_Library.h>//M9N
 #include "SHC_BNO055.h"
 
 #include "Arduino.h"
@@ -26,9 +26,9 @@ class StabAlg {
     int testRun();//returns 1-> GO CLOCK; -1-> GO COUNTER; 0-> DO NOTHING
     int autoTargetRun(unsigned long);//similar to testRun, just auto changes the targetValue every inputted minutes
 
-    void setTargetValue(double);
+    void setTarget(double);
     double getAngularPos();
-    double getTargetValue();
+    double getTarget();
 
     void setKp(double);
     void setKd(double);

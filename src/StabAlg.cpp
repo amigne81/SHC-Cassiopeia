@@ -257,7 +257,7 @@ void StabAlg::updateTestRun() {
 }
 
 //***********************SETTERS
-void StabAlg::setTargetValue(double value) {
+void StabAlg::setTarget(double value) {
     targetValue=value;
 }
 void StabAlg::setKp(double value) {
@@ -274,7 +274,7 @@ void StabAlg::setDeadband(double value) {
 double StabAlg::getAngularPos() {
     return angularPos;
 }
-double StabAlg::getTargetValue() {
+double StabAlg::getTarget() {
     return targetValue;
 }
 double StabAlg::getKp() {

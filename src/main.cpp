@@ -61,7 +61,6 @@ void Stabtest();
 void testSolenoids();
 void testTargetValueInfo();
 void testOrientation();
-void solenoidsTranslate(int);
 void chirp(int);
 
 int stateCheck();
@@ -128,15 +127,15 @@ void below_target(){
 unsigned long startTime;//move this to global variable initialization
 startTimeUK=millis();//move this to setup() to be initialized
 void target_alt(){
-
   unsigned long currTime=millis();
 
   if(startTimeUK+25<=currTime) {
-    TheUK.update();
+    TheUK.update(10);
     startTime=millis();
   }
   //data collection goes here
 }
+
 
 void descent(){
 
@@ -318,6 +317,8 @@ void testSolenoids() {
     delay(100);
     digitalWrite(solenoid_pin1, LOW);
 
+    delay(1000);
+
     digitalWrite(solenoid_pin2, HIGH);
     delay(100);
     digitalWrite(solenoid_pin2, LOW);
@@ -329,7 +330,7 @@ void testTargetValueInfo() {
     Serial.println(TheUK.findNewTarget());
 
     Serial.println("\n Dirrection: ");
-    Serial.println(TheUK.testRun());
+    Serial.println(TheUK.autoTargetRun(10));
 
     Serial.println("\n Hour: ");
     Serial.println(hotMenInYourArea.getHour());
@@ -338,32 +339,37 @@ void testTargetValueInfo() {
     Serial.println(hotMenInYourArea.getMinute());
 }
 
-void solenoidsTranslate(int instruction) {    
-    //Running the test to see if the payload spins correctly
-    // int instruction = update();//stab.testRun();
+void Stabtest() {//adjusts the targetValue to see that nothing breaks
 
-    if (instruction==CLOCKWISE) {//turn on 'right' solenoid???
-        digitalWrite(solenoid_pin1,LOW);
-        digitalWrite(solenoid_pin2,HIGH);
-        Serial.println("clockwise");
-    }
-    else if (instruction==COUNTERCLOCKWISE) {//turn on 'left' solenoid???
-        digitalWrite(solenoid_pin2, LOW);
-        digitalWrite(solenoid_pin1, HIGH);
-        Serial.println("counter");
-    }
-    else if (instruction==2) {//do nothing. Even the solenoids aren't being turned off        
-        Serial.println("nothing");
-    }
-    else {//instruction==CLOCKFOOL -> turn everything off
-        digitalWrite(solenoid_pin1, LOW);
-        digitalWrite(solenoid_pin2, LOW);
-        Serial.println("fool");
-    }
+  delay(1000);
 
-    Serial.println(TheUK.getAngularPos());
+  TheUK.setTarget(0);
+  TheUK.updateTestRun();
+  TheUK.updateTestRun();
 
-    //delay(50);//for testing, we will use delay. For the flight code, don't
+  delay(100);
+
+  TheUK.setTarget(45);
+  TheUK.updateTestRun();
+  TheUK.updateTestRun();
+
+  delay(100);
+
+  TheUK.setTarget(90);
+  TheUK.updateTestRun();
+  TheUK.updateTestRun();
+
+  delay(100);
+
+  TheUK.setTarget(45);
+  TheUK.updateTestRun();
+  TheUK.updateTestRun();
+
+  delay(100);
+
+  TheUK.setTarget(0);
+  TheUK.updateTestRun();
+  TheUK.updateTestRun();
 }
 
 int stateCheck(){
