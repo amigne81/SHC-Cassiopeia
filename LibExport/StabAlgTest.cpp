@@ -5,7 +5,7 @@
 
 //#include "SHC_BNO055.h"
 
-void Stabinit();
+void Stabinit();                    //what does this do?
 void Stabtest();
 
 
@@ -18,7 +18,7 @@ void setup() {
     Wire.begin();
     Serial.begin(9600);
 
-    ghj.init();//bno
+    ghj.init();//bno uses SHC
 
 }
 
