@@ -369,7 +369,7 @@ void setupSensors(){
   LEDs.on();
 
   delay(500);
-  for(int i = 0; (i< attempt_num) && !(hotMenInYourArea.begin()); i++){
+  for(int i = 0; (i <= attempt_num) && !(hotMenInYourArea.begin()); i++){
     Serial.println(" M9N not found     :(");
     if(i==attempt_num){
       erMen = false;
@@ -394,7 +394,7 @@ delay(3000);
 
   delay(500);
   // BNO055 bad
-  for(int i = 0; (i<= attempt_num) && (gayDar.init() == BNO_ERROR); i++){
+  for(int i = 0; (i <= attempt_num) && (gayDar.init() == BNO_ERROR); i++){
     Serial.println(" BNO055 not found   >:(");
     if(i==attempt_num){
       erGay = false;
@@ -414,7 +414,7 @@ delay(3000);
   LEDs.on();
   //BME280 (evil dastardly bad guy)
   Serial.println("BNO checked.");
-  for(int i = 0; (i<= attempt_num) && (guy.init() == BME_ERROR); i++){
+  for(int i = 0; (i <= attempt_num) && (guy.init() == BME_ERROR); i++){
     Serial.println(" BME280 not found  )=:");
     delay(100);
     Serial.println(guy.init() == BME_ERROR);
@@ -437,7 +437,7 @@ delay(3000);
   LEDs.on();
 
   //BMP3 good boy
-  for(int i = 0; (i<= attempt_num) && !(dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1)); i++){
+  for(int i = 0; (i <= attempt_num) && !(dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1)); i++){
     // Serial.print("the bmp is begingin? - ");
     //Serial.println(dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1));
     // Serial.print("the attempt num is... ");
