@@ -325,11 +325,13 @@ int stateCheck(){
   static long h;
   long dih = h;
 
-  h = -(77/9)*(t/1000)*((t/1000)-120);
+  h = -(77/56)*(t/1000)*((t/1000)-300);
   dih = (h-dih)/2;
 
 Serial.print("h:     ");
 Serial.println(h);
+Serial.print("t:     ");
+Serial.println(t);
 
   // checks values based on state: can move forward only one state at a time 
   switch(rec.state){
