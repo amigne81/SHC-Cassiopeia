@@ -20,7 +20,6 @@ private:
     // double mostRecentLatitude = 0.0;
     // double mostRecentAltitude = 0.0;
 
-    SFE_UBLOX_GNSS m9n;
     double longitude = 0.0;
     double latitude = 0.0;
     double altitude = 0.0;
@@ -32,6 +31,8 @@ private:
     int second = 0;
     int SIV = 0;
 public:
+    SFE_UBLOX_GNSS m9n;
+
     Error init();
     bool prefetchData();
     double getLatitude();

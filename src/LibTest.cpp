@@ -30,7 +30,6 @@ void setup() {
 
   GPSinit();
   BNOinit();
-  Serial.println("moments before catastrophe");
   BMEinit();
 }
 
@@ -58,24 +57,41 @@ void GPSinit() {
 }
 
 void GPStest() {
-  gps.prefetchData();
-  if (gps.getSIV() < 3) {
-    digitalWrite(LED_BUILTIN, HIGH);
-    Serial.println("Waiting for lock; SIV at " + String(gps.getSIV()));
-  } else {
-    digitalWrite(LED_BUILTIN, LOW);
-  }
-  Serial.println("Latitude: " + String(gps.getLatitude()));
-  Serial.println("Longitude: " + String(gps.getLongitude()));
-  Serial.println("Altitude: " + String(gps.getAltitude()));
-  Serial.print("" + String(gps.getYear()));
-  Serial.print(", " + String(gps.getMonth()));
-  Serial.print(" " + String(gps.getDay()));
-  Serial.print(" " + String(gps.getHour()));
-  Serial.print(":" + String(gps.getMinute()));
-  Serial.println(":" + String(gps.getSecond()));
-  Serial.println("SIV: " + String(gps.getSIV()));
-  Serial.println("UNIX: " + String(gps.getUnixTime()));
+   long latitude = gps.getLatitude();
+    Serial.print(F("Lat: "));
+    Serial.print(latitude);
+
+    long longitude = gps.getLongitude();
+    Serial.print(F(" Long: "));
+    Serial.print(longitude);
+    Serial.print(F(" (degrees * 10^-7)"));
+
+    long altitude = gps.getAltitude();
+    Serial.print(F(" Alt: "));
+    Serial.print(altitude);
+    Serial.print(F(" (mm)"));
+
+    byte SIV = gps.getSIV();
+    Serial.print(F(" SIV: "));
+    Serial.print(SIV);
+  // gps.prefetchData();
+  // if (gps.getSIV() < 3) {
+  //   digitalWrite(LED_BUILTIN, HIGH);
+  //   Serial.println("Waiting for lock; SIV at " + String(gps.getSIV()));
+  // } else {
+  //   digitalWrite(LED_BUILTIN, LOW);
+  // }
+  // Serial.println("Latitude: " + String(gps.getLatitude()));
+  // Serial.println("Longitude: " + String(gps.getLongitude()));
+  // Serial.println("Altitude: " + String(gps.getAltitude()));
+  // Serial.print("" + String(gps.getYear()));
+  // Serial.print(", " + String(gps.getMonth()));
+  // Serial.print(" " + String(gps.getDay()));
+  // Serial.print(" " + String(gps.getHour()));
+  // Serial.print(":" + String(gps.getMinute()));
+  // Serial.println(":" + String(gps.getSecond()));
+  // Serial.println("SIV: " + String(gps.getSIV()));
+  // Serial.println("UNIX: " + String(gps.getUnixTime()));
 
 }
 
