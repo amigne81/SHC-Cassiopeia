@@ -31,7 +31,7 @@ const int solenoid_pin1 = 3;
 const int solenoid_pin2 = 4;
 const int buzzerPin = 5;
 
-const int attempt_num = 350;        // number of attempts made before giving up on sensor
+const int attempt_num = 100;        // number of attempts made before giving up on sensor
 const int target_altitude = 20000;
 const int standby_thresh = 1;
 const int standby_exit_mod = 8; 
@@ -41,7 +41,7 @@ bool erMen = true, erGay = true, erGuy = true, erDude = true, erPower = true;
 // time duration requiredments to switch states in milliseconds: to target alt, to descent, to standby
 const unsigned long int tReq[3] = {20000,30000,60000};
 const int emergency_standby_exit= 5000; // time to exit if in target alt while in standby state (milliseconds)
-const int attempt_delay = 300; // delay between attempts of sensor initialization
+const int attempt_delay = 150; // delay between attempts of sensor initialization
 const int led_delay = 160;    // delay is between flashes, duration is the length of flashes
 const int led_duration = 40;
 
@@ -341,7 +341,7 @@ void setupSensors(){
 Serial.println("a");
   delay(500);
   // BNO055 bad
-  for(int i = 0; (i<= attempt_num) && (gayDar.init()== BNO_ERROR); i++){
+  for(int i = 0; (i<= attempt_num) && (gayDar.init() == BNO_ERROR); i++){
     Serial.println(" BNO055 not found   >:(");
     if(i==attempt_num){
       erGay = false;
@@ -354,15 +354,15 @@ Serial.println("a");
 
   //BME280 (evil dastardly bad guy)
   Serial.println("b");
-  for(int i = 0; (i<= attempt_num) && (guy.init()== BME_ERROR); i++){
+  for(int i = 0; (i<= attempt_num) && (guy.init() == BME_ERROR); i++){
     Serial.println(" BME280 not found  )=:");
-    Serial.println(String(guy.init()));
+    delay(100);
+    Serial.println(guy.init() == BME_ERROR);
     if(i==attempt_num){
       erGuy = false;
       Serial.println(" BME280 failed to initialize. IE3");
       Serial1.print("BME280-1, ");
     }
-
     delay(attempt_delay);
   }
 
@@ -371,10 +371,10 @@ Serial.println("c");
   //BMP3 good boy
   for(int i = 0; (i<= attempt_num) && !(dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1)); i++){
     // Serial.print("the bmp is begingin? - ");
-    // Serial.println(dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1));
+    //Serial.println(dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1));
     // Serial.print("the attempt num is... ");
     // Serial.println(i);
-    Serial.println(" BMP3 not found    :()");
+    // Serial.println(" BMP3 not found    :()");
     if(i==attempt_num){
       erDude = false;
       Serial.println(" BMP3 failed to initialize.   IE4");
