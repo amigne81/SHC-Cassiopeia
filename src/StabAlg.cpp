@@ -258,6 +258,13 @@ void StabAlg::updateTestRun() {
 
 //***********************SETTERS
 void StabAlg::setTarget(double value) {
+    while (value<0) {
+        value=value+360;
+    }
+    while (value>=360) {
+        value=value-360;
+    }
+
     targetValue=value;
 }
 void StabAlg::setKp(double value) {
@@ -267,7 +274,7 @@ void StabAlg::setKd(double value) {
     Kd=value;
 }
 void StabAlg::setDeadband(double value) {
-    deadband=value;
+    deadband=abs(value);
 }
 
 //********************GETTERS
