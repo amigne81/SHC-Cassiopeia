@@ -82,12 +82,12 @@ void setup() {
   setupSensors();
 
   if (erMen){
-    chirp(buzzerPin);
-    delay(500);    
-    chirp(buzzerPin);
-    delay(500);
-    chirp(buzzerPin);
-  }
+     chirp(buzzerPin);
+     delay(500);    
+     chirp(buzzerPin);
+     delay(500);
+     chirp(buzzerPin);
+   }
 }
 
 void loop() {
@@ -125,8 +125,17 @@ void below_target(){
 
 }
 
+unsigned long startTime;//move this to global variable initialization
+startTimeUK=millis();//move this to setup() to be initialized
 void target_alt(){
-  TheUK.update();
+
+  unsigned long currTime=millis();
+
+  if(startTimeUK+25<=currTime) {
+    TheUK.update();
+    startTime=millis();
+  }
+  //data collection goes here
 }
 
 void descent(){
@@ -266,6 +275,7 @@ void setupSensors(){
   hotMenInYourArea.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);
   }
 }
+
 
 void blink(){
   static int t;
