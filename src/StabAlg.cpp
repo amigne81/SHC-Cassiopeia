@@ -89,7 +89,7 @@ int StabAlg::testRun() {
 //This method below should be placed in loop() because of the variable timeGoneBy. May work improperly otherwise.
 //Note: The target will not change strictly at minuteUpdate minutes. This is fine.
 //As long as angularPos gets initalized, we are golden. If not, uh....
-int StabAlg::autoTargetRun(unsigned long minuteUpdate) {
+int StabAlg::autoTargetRun(double minuteUpdate) {
 
         //This prevents a division by zero when calculating derivative term
     unsigned long currTime = millis();

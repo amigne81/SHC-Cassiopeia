@@ -24,7 +24,7 @@ class StabAlg {
     BNO055 bno;
 
     int testRun();//returns 1-> GO CLOCK; -1-> GO COUNTER; 0-> DO NOTHING
-    int autoTargetRun(unsigned long);//similar to testRun, just auto changes the targetValue every inputted minutes
+    int autoTargetRun(double);//similar to testRun, just auto changes the targetValue every inputted positive minutes
 
     void setTarget(double);
     double getAngularPos();
