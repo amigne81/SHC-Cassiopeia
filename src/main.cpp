@@ -201,6 +201,7 @@ void setupSensors(){
 
   // BME280
   for(int i = 0; i<= attempt_num || !guy.init()== NO_ERROR; i++){
+    Serial.println(attempt_num);
     Serial.println(" BME280 not found  )=:");
     if(i==attempt_num){
       erGuy = false;
@@ -210,6 +211,7 @@ void setupSensors(){
      Serial.println("a\n");
     delay(attempt_delay);
      Serial.println("b\n");
+     Serial.println("---------------------------");
   }
   Serial.println("c\n");
   // BMP3
