@@ -25,8 +25,8 @@ void setup() {
 void loop() {
     // ghj.prefetchData();
 
-    stab.update();
-    delay(5);
+    stab.update(10);
+    delay(25);
 
     // solenoidTransalte();
 }

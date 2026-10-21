@@ -17,7 +17,6 @@
 #include "Arduino.h"
 #include "StabAlg.h"
 #include <SparkFun_u-blox_GNSS_Arduino_Library.h>//M9N
-#include <SHC_M9N.h>
 #include "SHC_BNO055.h"
 
 StabAlg::StabAlg(SFE_UBLOX_GNSS men, BNO055 bro) {
@@ -37,48 +36,11 @@ StabAlg::StabAlg(SFE_UBLOX_GNSS men, BNO055 bro) {
     previousTime=millis();
 }
 
-void StabAlg::update() {
-
-    if(updateCounter==5) {
-        solenoidTranslate(testRun());
-        // solenoidTranslate(autoTargetRun(1));//the target value would change every 1 minute
-        updateCounter=0;
-    }
-
-    updateCounter++;
-}
-
-void StabAlg::solenoidTranslate(int instruction) {    
-    //Running the test to see if the payload spins correctly
-    Serial.println(instruction);
-
-    if (instruction==CLOCKWISE) {//turn on 'right' solenoid???
-        digitalWrite(3,LOW);
-        digitalWrite(4,HIGH);
-        Serial.println("clockwise");
-    }
-    else if (instruction==COUNTERCLOCKWISE) {//turn on 'left' solenoid???
-        digitalWrite(4, LOW);
-        digitalWrite(3, HIGH);
-        Serial.println("counter");
-    }
-    else if (instruction==NOTHING) {//do nothing. Even the solenoids aren't being turned off        
-        Serial.println("nothing");
-    }
-    else {//instruction==CLOCKFOOL -> turn everything off
-        digitalWrite(3, LOW);
-        digitalWrite(4, LOW);
-        Serial.println("fool");
-    }
-}
-
-
 //This method is where the target value stays constant. Perfect for testing
 int StabAlg::testRun() {
 
         //This prevents a division by zero when calculating derivative term
     unsigned long currTime = millis();
-    //if (currTime>=previousTime+50) {//Delay Fix - Deadband Oscillation Problem WE ARE NOT DOING THIS
     if (currTime==previousTime) {
         return NOTHING;//enough time hasn't gone by for any changes, so thrusters will not turn on
     }
@@ -113,24 +75,6 @@ int StabAlg::testRun() {
         //Setting up the control system PD
     output = (Kp * error) + (Kd * derivative);
 
-        //Three Strikes Fix - Deadband Oscillation Problem
-    // if (output < 16 && output > 14) {
-    //     posStrike++;
-    //     if (posStrike==maxStrike) {
-    //         return FORCECOUNTER;
-    //     }
-    // }
-    // else if (output < -14 && output > -16) {
-    //     negStrike++;
-    //     if (negStrike==maxStrike) {
-    //         return FORCEWISE;
-    //     }
-    // }
-    // else {
-    //     posStrike=0;
-    //     negStrike=0;
-    // }
-
         //Bang-Bang
     //thruster direction output
     if (output > deadband) {
@@ -150,7 +94,7 @@ int StabAlg::autoTargetRun(unsigned long minuteUpdate) {
         //This prevents a division by zero when calculating derivative term
     unsigned long currTime = millis();
     if (currTime==previousTime) {//this prevents a division by zero when calculating derivative term
-        return NOTHING;//enough time hasn't gone by for any changes, so thrusters will not turn on
+        return NOTHING;//enough time hasn't gone by for any changes, so thrusters will not turn on/off
     }
 
         //Checks to see if it is time to update the target
@@ -215,6 +159,8 @@ int StabAlg::autoTargetRun(unsigned long minuteUpdate) {
 
 //Note: The math below runs accurately enough
 double StabAlg::findNewTarget() {
+    //Sam?? Do I need a m9n.prefetchData() here? That method doesn't exist..
+
     int day = 298;//october 25th, 2026 (not a leap year); launch day
 
     // testing values if the M9N does not work
@@ -234,7 +180,7 @@ double StabAlg::findNewTarget() {
 
     double latitudeRad = latitude * PI / 180.0;
 
-    double fractionalYear = ( (2*PI)/365 ) * (day-1 + ( (hour-12)/24.0 ) + (min/1440));
+    double fractionalYear = ( (2*PI)/365 ) * (day-1 + ( (hour-12)/24.0 ) + (min/1440.0));
 
     double cosFY = cos(fractionalYear);
     double sinFY = sin(fractionalYear);
@@ -274,6 +220,40 @@ double StabAlg::findNewTarget() {
         azimuthDeg += 360.0;
 
     return azimuthDeg;
+}
+
+//The method below tells the solenoids what to do
+void StabAlg::solenoidTranslate(int instruction) {    
+    Serial.println(instruction);
+
+    if (instruction==CLOCKWISE) {//turn on 'right' solenoid
+        digitalWrite(3,LOW);
+        digitalWrite(4,HIGH);
+        Serial.println("clockwise");
+    }
+    else if (instruction==COUNTERCLOCKWISE) {//turn on 'left' solenoid
+        digitalWrite(4, LOW);
+        digitalWrite(3, HIGH);
+        Serial.println("counter");
+    }
+    else if (instruction==NOTHING) {//do nothing. Even the solenoids aren't being turned off        
+        Serial.println("nothing");
+    }
+    else {//instruction==CLOCKFOOL -> turn everything off
+        digitalWrite(3, LOW);
+        digitalWrite(4, LOW);
+        Serial.println("fool");
+    }
+}
+
+//Moves the solenoids based on adjusting target
+void StabAlg::update(double min) {
+    solenoidTranslate(autoTargetRun(min));//(recommended 10 min)
+}
+
+//Moves the solenoids based on constant target
+void StabAlg::updateTestRun() {
+    solenoidTranslate(testRun());
 }
 
 //***********************SETTERS

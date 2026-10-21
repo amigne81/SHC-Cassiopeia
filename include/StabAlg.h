@@ -11,8 +11,6 @@ enum StabbingDirection {
     COUNTERCLOCKWISE=-1,
     CLOCKFOOL=0,//thrusters don't turn on
     NOTHING=2,//used for errors, such as when there could be a division by zero
-    FORCECOUNTER=-3,
-    FORCEWISE=3,
     };
 
 
@@ -21,7 +19,6 @@ class StabAlg {
     public:
 
     StabAlg(SFE_UBLOX_GNSS, BNO055);
-    StabAlg(BNO055 bro);//USED FOR TESTING
 
     SFE_UBLOX_GNSS m9n;
     BNO055 bno;
@@ -41,16 +38,13 @@ class StabAlg {
     void setDeadband(double);
     double getDeadband();
 
-    double findNewTarget();//this should be private
+    double findNewTarget();
 
-    void update();
+    void update(double);
+    void updateTestRun();
     void solenoidTranslate(int);
 
     private://************PRIVATE**************
-
-    // double findNewTarget();
-
-    int updateCounter=0;
 
     double timeGoneBy=0;//minutes
 
@@ -67,15 +61,7 @@ class StabAlg {
     double Kp=1.5;//experimental value
     double Kd=1;//experimental value
 
-    //NOTE: below will not be used in delay() bc Aerin
-    double delayTimeMillis=50;
-
     double deadband=15;//degrees, default value from the bible
-
-    int posStrike=0;
-    int negStrike=0;
-    int maxStrike=3;
-
 };//the devil, from the Bible
 
 #endif
