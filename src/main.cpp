@@ -366,8 +366,8 @@ Serial.println(t);
 
 void setupSensors(){
   // M9N
-  LED1.on();
-  LED2.on();
+  LEDs.on();
+
   delay(500);
   for(int i = 0; (i< attempt_num) && !(hotMenInYourArea.begin()); i++){
     Serial.println(" M9N not found     :(");
@@ -384,15 +384,13 @@ void setupSensors(){
   chirp(5);
   }
 
-  LED1.off();
-  LED2.off();
+  LEDs.off();
   
 Serial.println("M9N checked.");
 
 delay(3000);
 
-  LED1.on();
-  LED2.on();
+  LEDs.on();
 
   delay(500);
   // BNO055 bad
@@ -409,13 +407,11 @@ delay(3000);
     chirp(5);
   }
 
-  LED1.off();
-  LED2.off(); 
+  LEDs.off();
 
   delay(3000);
 
-  LED1.on();
-  LED2.on();
+  LEDs.on();
   //BME280 (evil dastardly bad guy)
   Serial.println("BNO checked.");
   for(int i = 0; (i<= attempt_num) && (guy.init() == BME_ERROR); i++){
@@ -433,14 +429,12 @@ delay(3000);
   if(erGuy){
     chirp(5);
   }
-  LED1.off();
-  LED2.off();
+  LEDs.off();
   Serial.println("BME checked.");
 
   delay(3000);
   
-  LED1.on();
-  LED2.on();
+  LEDs.on();
 
   //BMP3 good boy
   for(int i = 0; (i<= attempt_num) && !(dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1)); i++){
@@ -465,8 +459,7 @@ delay(3000);
   chirp(5);
   }
 
-  LED1.off();
-  LED2.off();
+  LEDs.off();
 /*
   // INA260 also evil  bad never ever ever again
   power = Adafruit_INA260();
