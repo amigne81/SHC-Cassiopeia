@@ -43,6 +43,7 @@ class StabAlg {
     void update(double);
     void updateTestRun();
     void solenoidTranslate(int);
+    
 
     private://************PRIVATE**************
 
