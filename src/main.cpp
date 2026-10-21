@@ -22,7 +22,7 @@ Adafruit_BMP3XX dude = Adafruit_BMP3XX();
 // global object initalization
 Data rec;
 StabAlg TheUK = StabAlg(hotMenInYourArea, gayDar);
-LED LED1(-1), LED2(-1); 
+LED LEDs(2);
 
 
 
@@ -42,7 +42,7 @@ bool erMen = true, erGay = true, erGuy = true, erDude = true, erPower = true;
 const unsigned long int tReq[3] = {20000,30000,60000};
 const int emergency_standby_exit= 5000; // time to exit if in target alt while in standby state (milliseconds)
 const int attempt_delay = 150; // delay between attempts of sensor initialization
-const int led_delay = 160;    // delay is between flashes, duration is the length of flashes
+const int led_delay = 460;    // delay is between flashes, duration is the length of flashes
 const int led_duration = 40;
 const int standby_delay = 3000;
 
@@ -129,9 +129,9 @@ void loop() {
       break;
   }
 
-  chirp(buzzerPin);
-
-  output();
+  Serial.print("state: ");
+  Serial.println(rec.state);
+  //output();
   // delay(5000) // for testing
 }
 
@@ -236,17 +236,13 @@ void blink(){
   static int t;
   t+=rec.time.dt;
 
-if(LED1.getState()){
+if(LEDs.getState()){
   if(t>led_duration){
-    LED1.off();
-    LED2.off();
+    LEDs.off();
     t = 0;
   } 
 }else if(t>led_delay){
-    LED1.on();
-    LED2.on(
-
-    );
+    LEDs.on();
     t = 0;
   }
 }
@@ -323,8 +319,18 @@ void solenoidsTranslate(int instruction) {
 
 int stateCheck(){
   static unsigned long int dur[4];
-  int dih = rec.getDh();
-  int h = rec.getH();
+  //int dih = rec.getDh();
+  //int h = rec.getH();
+  long t = millis();
+  static long h;
+  long dih = h;
+
+  h = -(77/9)*(t/1000)*((t/1000)-120);
+  dih = (h-dih)/2;
+
+Serial.print("h:     ");
+Serial.println(h);
+
   // checks values based on state: can move forward only one state at a time 
   switch(rec.state){
     case 0: // ascent to target alt
