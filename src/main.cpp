@@ -68,7 +68,6 @@ int stateCheck();
 
 void setup() {
 
-
   Serial.begin(9600);
   delay(750);
   Serial.println("Program start0\n");
@@ -82,13 +81,13 @@ void setup() {
   delay(750);
   setupSensors();
 
-  // if (erMen){
-  //   chirp(buzzerPin);
-  //   delay(500);    
-  //   chirp(buzzerPin);
-  //   delay(500);
-  //   chirp(buzzerPin);
-  // }
+  if (erMen){
+    chirp(buzzerPin);
+    delay(500);    
+    chirp(buzzerPin);
+    delay(500);
+    chirp(buzzerPin);
+  }
 }
 
 void loop() {
@@ -286,7 +285,7 @@ if(LED1.getState()){
     t = 0;
   }
 }
-
+*/
 void chirp(int pin){
   for(int i = 0; i < 400; i++){
         digitalWrite(pin,HIGH);
@@ -301,7 +300,7 @@ void chirp(int pin){
         delayMicroseconds(i);
     } 
 }
-
+/*
 void testSolenoids() {
     delay(1000);
 
