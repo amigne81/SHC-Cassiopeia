@@ -62,6 +62,7 @@ void testSolenoids();
 void testTargetValueInfo();
 void testOrientation();
 void solenoidsTranslate(int);
+void chirp(int);
 
 int stateCheck();
 
@@ -74,13 +75,6 @@ void setup() {
   Serial.println("Program start\n");
 
   setupSensors();
-
-  // chirp
-  chirp(buzzerPin);
-  delay(500);
-  chirp(buzzerPin);
-  delay(500);
-
 
   if (erMen){
     chirp(buzzerPin);
