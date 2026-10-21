@@ -31,7 +31,7 @@ const int solenoid_pin1 = 3;
 const int solenoid_pin2 = 4;
 const int buzzerPin = 5;
 
-const int attempt_num = 15;        // number of attempts made before giving up on sensor
+const int attempt_num = 350;        // number of attempts made before giving up on sensor
 const int target_altitude = 20000;
 const int standby_thresh = 1;
 const int standby_exit_mod = 8; 
@@ -41,7 +41,7 @@ bool erMen = true, erGay = true, erGuy = true, erDude = true, erPower = true;
 // time duration requiredments to switch states in milliseconds: to target alt, to descent, to standby
 const unsigned long int tReq[3] = {20000,30000,60000};
 const int emergency_standby_exit= 5000; // time to exit if in target alt while in standby state (milliseconds)
-const int attempt_delay = 500; // delay between attempts of sensor initialization
+const int attempt_delay = 300; // delay between attempts of sensor initialization
 const int led_delay = 160;    // delay is between flashes, duration is the length of flashes
 const int led_duration = 40;
 
@@ -61,6 +61,7 @@ void Stabtest();
 void testSolenoids();
 void testTargetValueInfo();
 void testOrientation();
+void solenoidsTranslate(int);
 void chirp(int);
 
 int stateCheck();
@@ -126,15 +127,8 @@ void below_target(){
 }
 
 void target_alt(){
-  unsigned long currTime=millis();
-
-  if(startTimeUK+25<=currTime) {
-    TheUK.update(10);
-    startTime=millis();
-  }
-  //data collection goes here
+  TheUK.update();
 }
-
 
 void descent(){
 
@@ -178,7 +172,7 @@ void recSensors(){
     rec.tempE = dude.readTemperature();
     rec.pressure = dude.readPressure();
   }
-  /*
+  
   if(erPower){
     rec.bat.setX(power.readBusVoltage());
     rec.bat.setY(power.readCurrent());
@@ -233,8 +227,6 @@ void testSolenoids() {
     delay(100);
     digitalWrite(solenoid_pin1, LOW);
 
-    delay(1000);
-
     digitalWrite(solenoid_pin2, HIGH);
     delay(100);
     digitalWrite(solenoid_pin2, LOW);
@@ -246,7 +238,7 @@ void testTargetValueInfo() {
     Serial.println(TheUK.findNewTarget());
 
     Serial.println("\n Dirrection: ");
-    Serial.println(TheUK.autoTargetRun(10));
+    Serial.println(TheUK.testRun());
 
     Serial.println("\n Hour: ");
     Serial.println(hotMenInYourArea.getHour());
@@ -255,37 +247,32 @@ void testTargetValueInfo() {
     Serial.println(hotMenInYourArea.getMinute());
 }
 
-void Stabtest() {//adjusts the targetValue to see that nothing breaks
+void solenoidsTranslate(int instruction) {    
+    //Running the test to see if the payload spins correctly
+    // int instruction = update();//stab.testRun();
 
-  delay(1000);
+    if (instruction==CLOCKWISE) {//turn on 'right' solenoid???
+        digitalWrite(solenoid_pin1,LOW);
+        digitalWrite(solenoid_pin2,HIGH);
+        Serial.println("clockwise");
+    }
+    else if (instruction==COUNTERCLOCKWISE) {//turn on 'left' solenoid???
+        digitalWrite(solenoid_pin2, LOW);
+        digitalWrite(solenoid_pin1, HIGH);
+        Serial.println("counter");
+    }
+    else if (instruction==2) {//do nothing. Even the solenoids aren't being turned off        
+        Serial.println("nothing");
+    }
+    else {//instruction==CLOCKFOOL -> turn everything off
+        digitalWrite(solenoid_pin1, LOW);
+        digitalWrite(solenoid_pin2, LOW);
+        Serial.println("fool");
+    }
 
-  TheUK.setTarget(0);
-  TheUK.updateTestRun();
-  TheUK.updateTestRun();
+    Serial.println(TheUK.getAngularPos());
 
-  delay(100);
-
-  TheUK.setTarget(45);
-  TheUK.updateTestRun();
-  TheUK.updateTestRun();
-
-  delay(100);
-
-  TheUK.setTarget(90);
-  TheUK.updateTestRun();
-  TheUK.updateTestRun();
-
-  delay(100);
-
-  TheUK.setTarget(45);
-  TheUK.updateTestRun();
-  TheUK.updateTestRun();
-
-  delay(100);
-
-  TheUK.setTarget(0);
-  TheUK.updateTestRun();
-  TheUK.updateTestRun();
+    //delay(50);//for testing, we will use delay. For the flight code, don't
 }
 
 int stateCheck(){
@@ -337,8 +324,7 @@ int stateCheck(){
 void setupSensors(){
   // M9N
   delay(500);
-  hotMenInYourArea = SFE_UBLOX_GNSS();
-  for(int i = 0; (i< attempt_num && !hotMenInYourArea.begin()); i++){
+  for(int i = 0; (i< attempt_num) && !(hotMenInYourArea.begin()); i++){
     Serial.println(" M9N not found     :(");
     if(i==attempt_num){
       erMen = false;
@@ -355,8 +341,7 @@ void setupSensors(){
 Serial.println("a");
   delay(500);
   // BNO055 bad
-  gayDar = BNO055();
-  for(int i = 0; i<= attempt_num && !gayDar.init()== NO_ERROR; i++){
+  for(int i = 0; (i<= attempt_num) && (gayDar.init()== BNO_ERROR); i++){
     Serial.println(" BNO055 not found   >:(");
     if(i==attempt_num){
       erGay = false;
@@ -369,8 +354,7 @@ Serial.println("a");
 
   //BME280 (evil dastardly bad guy)
   Serial.println("b");
-  guy = SHC_BME280();
-  for(int i = 0; i<= attempt_num && guy.init()== BME_ERROR; i++){
+  for(int i = 0; (i<= attempt_num) && (guy.init()== BME_ERROR); i++){
     Serial.println(" BME280 not found  )=:");
     Serial.println(String(guy.init()));
     if(i==attempt_num){
@@ -385,7 +369,7 @@ Serial.println("a");
 Serial.println("c");
   delay(500);
   //BMP3 good boy
-  for(int i = 0; i<= attempt_num && !dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1); i++){
+  for(int i = 0; (i<= attempt_num) && !(dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1)); i++){
     // Serial.print("the bmp is begingin? - ");
     // Serial.println(dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1));
     // Serial.print("the attempt num is... ");
@@ -418,17 +402,15 @@ Serial.println("c");
   }
 */
 Serial.println("d");
-  Serial.println(" Sensors Initlialized: ."+
-    (erMen)? "\n  M9N":"" +
-    (erGay)? "\n  BNO055":"" +
-    (erGuy)? "\n  BME280":"" +
-    (erDude)? "\n  BMP3":"" +
-    (!(erMen|| erGay|| erGuy|| erDude))? "\n  None":""
-  );
+  Serial.println(" Sensors Initlialized: .");
+  if(erMen){Serial.println("\n  M9N");}
+  if(erGay){Serial.println("\n  BNO055");}
+  if(erGuy){Serial.println("\n  BME280");}
+  if(erDude){Serial.println("\n  BMP3");}
+  if(!(erMen|| erGay|| erGuy|| erDude)){Serial.println("\n  None");}
+  
 
   // sensor config
   Serial.println("e");
  
 }
-
-// testing
