@@ -105,22 +105,22 @@ void loop() {
   switch(rec.state){
     case 0:
       below_target();
-      blink();
       break;
     case 1:
       target_alt();
+      break;
     case 2:
       descent();
     case 3:
       standby();
-      blink();
       break;
     default:
       nError = -1;
-      blink();
       break;
   }
-
+  if(rec.state!=3){
+    blink();
+  }
   Serial.print("state: ");
   Serial.println(rec.state);
   output();
@@ -150,9 +150,9 @@ void standby(){
 }
 
 void fetch(){
-  gayDar.prefetchData();
-  guy.prefetchData();
-  dude.performReading();
+  if(erGay)  {gayDar.prefetchData();}
+  if(erGuy)  {guy.prefetchData();}
+  if(erDude) {dude.performReading();}
 }
 
 void recMen(){
@@ -214,10 +214,10 @@ void outDude(){
 void recSensors(){
   fetch();
 
-  recMen();
-  gayWreck();
-  recGuy();
-  recDude();
+  if(erMen){recMen();}
+  if(erGay){gayWreck();}
+  if(erGuy){recGuy();}
+  if(erDude){recDude();}
 }
 
 void output(){
@@ -332,6 +332,7 @@ int stateCheck(){
       if(h >= target_altitude){
         dur[0] += rec.time.dt;
       }else{dur[0]=0; dur[1]=0; dur[2] = 0;}
+      break;
 
     case 1: // target alt to descent
       if(dih<0){
@@ -340,15 +341,17 @@ int stateCheck(){
         dur[1] = 0;
         dur[0] += rec.time.dt;
       }else{dur[0]=0; dur[1]=0; dur[2] = 0;}
+      break;
 
     case 2: // descent to standby
-      if((dih > standby_thresh || dih < -standby_thresh) && h < target_altit){
+      if((dih > standby_thresh || dih < -standby_thresh) && h < target_altitude){
         dur[2] += rec.time.dt;
       }else if(dih<0){ // revert check to descent
         dur[1] += rec.time.dt;
         if(dur[1] > rec.time.dt*standby_exit_mod) // because negative dh could be higher than expected while in standby it must be continous for longer to reset progress towards standby
           dur[2] = 0;
       }else{dur[0]=0; dur[1]=0; dur[2] = 0;}
+      break;
 
     case 3: // standby operates seperate from others and only goes to target altitude
       if(h > target_altitude){
@@ -357,6 +360,7 @@ int stateCheck(){
       if(dur[3] >= emergency_standby_exit){
         return 1;
       }
+      break;
   }
 
   for(int i = 2; i>=0;i--){
@@ -386,13 +390,35 @@ void setupSensors(){
   hotMenInYourArea.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);
   }
 
-delay(1500);
+  delay(1500);
   LEDs.off();
   delay(3000);
   LEDs.on();
   delay(500);
 
-//BME280 (evil dastardly bad guy)
+Serial.println("M9N checked.");
+  // BNO055 bad
+  for(int i = 0; (i<= attempt_num) && (gayDar.init() == BNO_ERROR); i++){
+    Serial.println(" BNO055 not found   >:(");
+    if(i==attempt_num){
+      erGay = false;
+      Serial.println(" BNO055 failed to initialize.  IE2");
+      Serial1.print("BNO055-1, ");
+    }
+    delay(attempt_delay);
+  }
+
+  if(erGay){
+    chirp(5);
+  }
+
+  delay(1500);
+  LEDs.off();
+  delay(3000);
+  LEDs.on();
+  delay(500);
+
+  //BME280 (evil dastardly bad guy)
   Serial.println("BNO checked.");
   for(int i = 0; (i<= attempt_num) && (guy.init() == BME_ERROR); i++){
     Serial.println(" BME280 not found  )=:");
@@ -405,59 +431,6 @@ delay(1500);
     }
     delay(attempt_delay);
   }
-
-  delay(1500);
-  LEDs.off();
-  delay(3000);
-  LEDs.on();
-  delay(500);
-
-Serial.println("M9N checked.");
-  // BNO055 bad
-  gayDar.init();
-  for(int i = 0; (i<= attempt_num) && (gayDar.init() == BNO_ERROR); i++){
-    Serial.println(" BNO055 not found   >:(");
-    if(i==attempt_num){
-      erGay = false;
-      Serial.println(" BNO055 failed to initialize.  IE2");
-      Serial1.print("BNO055-1, ");
-    }
-    delay(attempt_delay);
-  }
-
-gayDar.prefetchData();
-  Serial.print("Accel: (" + String(gayDar.getAccelerationX()));
-  Serial.print(", " + String(gayDar.getAccelerationY()));
-  Serial.println(", " + String(gayDar.getAccelerationZ()) + ")");
-  Serial.print("Gyro: (" + String(gayDar.getGyroX()));
-  Serial.print(", " + String(gayDar.getGyroY()));
-  Serial.println(", " + String(gayDar.getGyroZ()) + ")");
-  Serial.print("Orient: (" + String(gayDar.getOrientationX()));
-  Serial.print(", " + String(gayDar.getOrientationY()));
-  Serial.println(", " + String(gayDar.getOrientationZ()) + ")");
-
-  if(erGay){
-    chirp(5);
-  }
-
-  delay(1500);
-  LEDs.off();
-  delay(3000);
-  LEDs.on();
-  delay(500);
-
-  
-
-gayDar.prefetchData();
-  Serial.print("Accel: (" + String(gayDar.getAccelerationX()));
-  Serial.print(", " + String(gayDar.getAccelerationY()));
-  Serial.println(", " + String(gayDar.getAccelerationZ()) + ")");
-  Serial.print("Gyro: (" + String(gayDar.getGyroX()));
-  Serial.print(", " + String(gayDar.getGyroY()));
-  Serial.println(", " + String(gayDar.getGyroZ()) + ")");
-  Serial.print("Orient: (" + String(gayDar.getOrientationX()));
-  Serial.print(", " + String(gayDar.getOrientationY()));
-  Serial.println(", " + String(gayDar.getOrientationZ()) + ")");
 
   if(erGuy){
     chirp(5);
@@ -498,18 +471,6 @@ gayDar.prefetchData();
   delay(3000);
   LEDs.on();
   delay(500);
-
-gayDar.prefetchData();
-  Serial.print("Accel: (" + String(gayDar.getAccelerationX()));
-  Serial.print(", " + String(gayDar.getAccelerationY()));
-  Serial.println(", " + String(gayDar.getAccelerationZ()) + ")");
-  Serial.print("Gyro: (" + String(gayDar.getGyroX()));
-  Serial.print(", " + String(gayDar.getGyroY()));
-  Serial.println(", " + String(gayDar.getGyroZ()) + ")");
-  Serial.print("Orient: (" + String(gayDar.getOrientationX()));
-  Serial.print(", " + String(gayDar.getOrientationY()));
-  Serial.println(", " + String(gayDar.getOrientationZ()) + ")");
-
 /*
   // INA260 also evil  bad never ever ever again
   power = Adafruit_INA260();
@@ -531,14 +492,5 @@ Serial.println("d");
   if(erDude){Serial.println("\n  BMP3");}
   if(!(erMen|| erGay|| erGuy|| erDude)){Serial.println("\n  None");}
   
- gayDar.prefetchData();
-  Serial.print("Accel: (" + String(gayDar.getAccelerationX()));
-  Serial.print(", " + String(gayDar.getAccelerationY()));
-  Serial.println(", " + String(gayDar.getAccelerationZ()) + ")");
-  Serial.print("Gyro: (" + String(gayDar.getGyroX()));
-  Serial.print(", " + String(gayDar.getGyroY()));
-  Serial.println(", " + String(gayDar.getGyroZ()) + ")");
-  Serial.print("Orient: (" + String(gayDar.getOrientationX()));
-  Serial.print(", " + String(gayDar.getOrientationY()));
-  Serial.println(", " + String(gayDar.getOrientationZ()) + ")");
+ 
 }
