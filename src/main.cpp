@@ -314,13 +314,9 @@ int stateCheck(){
   //int h = rec.getH();
 
   // testing -------------------------------------- this never went into landing stage bc it was continuously decrasing
-  long t = millis();
-  static long h;
-  long dih = h;
-
-  // h = -(77/56)*(t/1000)*((t/1000)-300);
-  // dih = (h-dih)/2;
-// -----------------------------------------------------
+  long h = 25000;
+  long dih = 0; 
+  // -----------------------------------------------------
 
 // Serial.print("h:     ");
 // Serial.println(h);
