@@ -80,12 +80,12 @@ Error M9N::init() {
     }
     m9n.setI2COutput(COM_TYPE_UBX);
     m9n.setNavigationFrequency(5);
-    if (!m9n.setDynamicModel(DYN_MODEL_AIRBORNE4g)) {
+    m9n.setDynamicModel(DYN_MODEL_AIRBORNE4g);
     //     //return M9N_ERROR;
     // }
     m9n.saveConfiguration();
     m9n.setAutoPVTcallbackPtr(&pvtCallback);
-    }
+    //}
     // bool sivCheck = config.waitForGPSLock;
 
     // Make it not block

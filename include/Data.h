@@ -14,6 +14,7 @@ struct Data{
 	Clock time;
 	int tempI, tempE, pressure, humidity;
 	int state;
+	String UTC;
 
 	Data();
 

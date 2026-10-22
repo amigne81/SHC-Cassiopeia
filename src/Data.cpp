@@ -47,7 +47,7 @@ GYRO_X, GYRO_Y, GYRO_Z, GPS_LAT, GPS_LONG, GPS_ALT
 String Data::outCSV(){
 	Data::count++;
 	Serial.println(time.UTC());
-	return Data::ID + ", " + String(time.t()) + ", " + time.UTC() +
+	return Data::ID + ", " + String(time.t()) + ", " + UTC +
 	String(Data::count) + ", " + String(Data::state)+ ", " + String(Data::GPS.getZ()) +  ", " + 
 	String(Data::tempI) + ", " + Data::Acc.outCSV() + ", " + Data::Gyro.outCSV() + ", " + Data::GPS.outCSV() + ", " +
 	String(pressure) + ", " + String(humidity);

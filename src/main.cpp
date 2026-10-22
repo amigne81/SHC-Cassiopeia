@@ -24,6 +24,21 @@ Data rec = Data();
 StabAlg TheUK = StabAlg(hotMenInYourArea, gayDar);
 LED LEDs(2);
 
+// --------------- fix gps prettiest pleases --------------------------
+
+int mostRecentYear = 0;
+int mostRecentMonth = 0;
+int mostRecentDay = 0;
+int mostRecentHour = 0;
+int mostRecentMinute = 0;
+int mostRecentSecond = 0;
+int mostRecentSIV = 0;
+double mostRecentLongitude = 0.0;
+double mostRecentLatitude = 0.0;
+double mostRecentAltitude = 0.0;
+
+// --------------------------------------------------------------------
+
 // global variable intialization
 const int solenoid_pin1 = 3;
 const int solenoid_pin2 = 4;
@@ -44,6 +59,8 @@ const int attempt_delay = 150; // delay between attempts of sensor initializatio
 const int led_delay = 460;    // delay is between flashes, duration is the length of flashes
 const int led_duration = 40;
 const int standby_delay = 3000;
+int i = 0;
+
 
 unsigned long startTimeUK;
 
@@ -73,6 +90,7 @@ void recGuy();
 void outGuy();
 void recDude();
 void outDude();
+Error init();
 
 int stateCheck();
 
@@ -95,9 +113,14 @@ void setup() {
 
 void loop() {
   
+  if(i==4){
+    recSensors();
+    i=0;
+  }
+  i++;
   rec.time.setdt();
+  
   rec.state = stateCheck();
-  recSensors();
 
   switch(rec.state){
     case 0:
@@ -115,11 +138,14 @@ void loop() {
       nError = -1;
       break;
   }
+
   if(rec.state!=3){
     blink();
   }
+
   Serial.print("state: ");
   Serial.println(rec.state);
+  
   output();
   // delay(5000) // for testing
 }
@@ -147,65 +173,66 @@ void standby(){
 }
 
 void fetch(){
+  if(erMen){hotMenInYourArea.checkUblox();
+  hotMenInYourArea.checkCallbacks();}
   if(erGay)  {gayDar.prefetchData();}
   if(erGuy)  {guy.prefetchData();}
   if(erDude) {dude.performReading();}
 }
 
 void recMen(){
-  rec.GPS.setX(hotMenInYourArea.getLongitude());
-  rec.GPS.setY(hotMenInYourArea.getLatitude());
-  rec.GPS.setZ(hotMenInYourArea.getAltitude());
+  Serial.println("M9N");
+  Serial.println(millis());
+  rec.GPS.setX(mostRecentLongitude);
+  Serial.println(millis());
+  rec.GPS.setY(mostRecentLatitude);
+  Serial.println(millis());
+  rec.GPS.setZ(mostRecentAltitude);
+  
 }
 
-void outMen(){
-  Serial.println("Longitude: "+ hotMenInYourArea.getLongitude());
-  Serial.println("Latitude: "+ hotMenInYourArea.getLatitude());
-  Serial.println("Altitude: "+ hotMenInYourArea.getAltitude());
+void setUTC(){
+  rec.UTC = String(mostRecentHour)	+", ";//+ 
+	String(mostRecentMinute) 		+", "+
+	String(mostRecentSecond) 		+", "+
+	String(mostRecentMonth) 			+", "+
+	String(mostRecentDay)			+", "+
+	String(mostRecentYear);	
 }
 
 void gayWreck(){
+  Serial.println("BNO:");
+  Serial.println(millis());
   rec.Gyro.setX(gayDar.getGyroX());
+  Serial.println(millis());
   rec.Gyro.setY(gayDar.getGyroY());
+  Serial.println(millis());
   rec.Gyro.setZ(gayDar.getGyroZ());
-
+  Serial.println(millis());
   rec.Acc.setX(gayDar.getAccelerationX());
+  Serial.println(millis());
   rec.Acc.setY(gayDar.getAccelerationY());
+  Serial.println(millis());
   rec.Acc.setZ(gayDar.getAccelerationZ());
-}
-
-void outCloset(){
-  Serial.println("orient X: " + String(gayDar.getOrientationX()));
-  Serial.println("orient Y: " + String(gayDar.getOrientationY()));
-  Serial.println("orient Z: " + String(gayDar.getOrientationZ()));
-  
-  Serial.println("Gyro X: " + String(gayDar.getGyroX()));
-  Serial.println("Gyro Y: " + String(gayDar.getGyroY()));
-  Serial.println("Gyro Z: " + String(gayDar.getGyroZ()));
-
-  Serial.println("Acc X: " + String(gayDar.getAccelerationX()));
-  Serial.println("Acc Y: " + String(gayDar.getAccelerationY()));
-  Serial.println("ACC Z: " + String(gayDar.getAccelerationZ()));
+  Serial.println(millis());
 }
 
 void recGuy(){
+  Serial.println("BME: ");
+  Serial.println(millis());
   rec.tempI = guy.getTemperature();
+  Serial.println(millis());
   rec.humidity = guy.getHumidity();
-}
-
-void outGuy(){
-  Serial.println("tempI: "+ String(guy.getTemperature(),5));
-  Serial.println("humid: "+ String(guy.getHumidity()));
+  Serial.println(millis());
 }
 
 void recDude(){
+  Serial.println("BMP");
+  Serial.println(millis());
   rec.tempE = dude.readTemperature();
+  Serial.println(millis());
   rec.pressure = dude.readPressure();
-}
-
-void outDude(){
-  Serial.println("tempE: " + String(dude.readTemperature(),5));
-  Serial.println("presr: " + String(dude.readPressure(),5));
+  Serial.println(millis());
 }
 
 void recSensors(){
@@ -230,12 +257,10 @@ void blink(){
 if(LEDs.getState()){
   if(LED_count>led_duration){
     LEDs.off();
-    Serial.println("off");
     LED_count = 0;
   } 
 }else if(LED_count>led_delay){
     LEDs.on();
-    Serial.println("on");
     LED_count = 0;
   }
 }
@@ -374,7 +399,7 @@ void setupSensors(){
   // M9N
   LEDs.on();
   delay(500);
-  for(int i = 0; (i<= attempt_num) && !(hotMenInYourArea.begin()); i++){
+  for(int i = 0; (i<= attempt_num) && (init() == M9N_ERROR); i++){
     Serial.println(" M9N not found     :(");
     if(i==attempt_num){
       erMen = false;
@@ -492,3 +517,92 @@ Serial.println("d");
   
  
 }
+
+void outDude(){
+  Serial.println("tempE: " + String(dude.readTemperature(),5));
+  Serial.println("presr: " + String(dude.readPressure(),5));
+}
+
+void outGuy(){
+  Serial.println("tempI: "+ String(guy.getTemperature(),5));
+  Serial.println("humid: "+ String(guy.getHumidity()));
+}
+
+void outMen(){
+  Serial.println("Longitude: "+ hotMenInYourArea.getLongitude());
+  Serial.println("Latitude: "+ hotMenInYourArea.getLatitude());
+  Serial.println("Altitude: "+ hotMenInYourArea.getAltitude());
+}
+void outCloset(){
+  Serial.println("orient X: " + String(gayDar.getOrientationX()));
+  Serial.println("orient Y: " + String(gayDar.getOrientationY()));
+  Serial.println("orient Z: " + String(gayDar.getOrientationZ()));
+  
+  Serial.println("Gyro X: " + String(gayDar.getGyroX()));
+  Serial.println("Gyro Y: " + String(gayDar.getGyroY()));
+  Serial.println("Gyro Z: " + String(gayDar.getGyroZ()));
+
+  Serial.println("Acc X: " + String(gayDar.getAccelerationX()));
+  Serial.println("Acc Y: " + String(gayDar.getAccelerationY()));
+  Serial.println("ACC Z: " + String(gayDar.getAccelerationZ()));
+}
+
+void pvtCallback(UBX_NAV_PVT_data_t *ubxDataStruct) {
+    mostRecentLatitude = ((double)ubxDataStruct->lat) * pow(10, -7);
+    mostRecentLongitude = ((double)ubxDataStruct->lon) * pow(10, -7);
+    mostRecentAltitude = ubxDataStruct->height / 1000.0;
+      
+    mostRecentYear = (int)ubxDataStruct->year;
+    mostRecentMonth = (int)ubxDataStruct->month;
+    mostRecentDay = (int)ubxDataStruct->day;
+    mostRecentHour = (int)ubxDataStruct->hour;
+    mostRecentMinute = (int)ubxDataStruct->min;
+    mostRecentSecond = (int)ubxDataStruct->sec;
+    mostRecentSIV = ubxDataStruct->numSV;
+}
+
+Error init() {
+    if (!hotMenInYourArea.begin()) {
+        return M9N_ERROR;
+    }
+    hotMenInYourArea.setI2COutput(COM_TYPE_UBX);
+    hotMenInYourArea.setNavigationFrequency(5);
+    hotMenInYourArea.setDynamicModel(DYN_MODEL_AIRBORNE4g);
+    //     //return M9N_ERROR;
+    // }
+    hotMenInYourArea.saveConfiguration();
+    hotMenInYourArea.setAutoPVTcallbackPtr(&pvtCallback);
+    //}
+    // bool sivCheck = config.waitForGPSLock;
+
+    // Make it not block
+    // while (sivCheck) {
+    //     m9n.checkUblox();
+    //     m9n.checkCallbacks();
+    //     switch (mostRecentSIV) {
+    //         // TODO ERRORS
+    //         default:
+    //             sivCheck = false;
+    //             break;
+    //     }
+    // }
+    return NO_ERROR;
+}
+
+bool prefetchData() {
+    hotMenInYourArea.checkUblox();
+    hotMenInYourArea.checkCallbacks();
+    // longitude = mostRecentLongitude;
+    // latitude = mostRecentLatitude;
+    // altitude = mostRecentAltitude;
+    // year = mostRecentYear;
+    // month = mostRecentMonth;
+    // day = mostRecentDay;
+    // hour = mostRecentHour;
+    // minute = mostRecentMinute;
+    // second = mostRecentSecond;
+    // SIV = mostRecentSIV;
+    return true;
+}
+
+

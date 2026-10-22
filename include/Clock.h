@@ -12,8 +12,7 @@ class Clock {
 	const int l = 5;
  
 
-	public:
-	void setUTC(SFE_UBLOX_GNSS*);	
+	public:	
 	unsigned long int dt;
 	unsigned long int t();
 	String UTC();
