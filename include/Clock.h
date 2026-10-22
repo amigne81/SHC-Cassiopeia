@@ -10,10 +10,13 @@ class Clock {
 	unsigned long int previous = 0;
 	String utc;
 	const int l = 5;
+	SFE_UBLOX_GNSS* p;
+	void setUTC(); 
 
 	public:
+	Clock();
+	Clock(SFE_UBLOX_GNSS*);
 	unsigned long int dt;
-	void setUTC(SFE_UBLOX_GNSS*); 
 	unsigned long int t();
 	String UTC();
 	void setdt();
