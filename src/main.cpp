@@ -90,8 +90,6 @@ void recGuy();
 void outGuy();
 void recDude();
 void outDude();
-void outUTC();
-
 Error init();
 
 int stateCheck();
@@ -114,7 +112,6 @@ void setup() {
 }
 
 void loop() {
-  
   if(i==4){
     recSensors();
     i=0;
@@ -144,6 +141,9 @@ void loop() {
   if(rec.state!=3){
     blink();
   }
+
+  Serial.print("state: ");
+  Serial.println(rec.state);
   
   output();
   // delay(5000) // for testing
@@ -180,16 +180,16 @@ void fetch(){
 }
 
 void recMen(){
-  // Serial.println("M9N");
-  // Serial.println(millis());
+  Serial.println("M9N");
+  Serial.println(millis());
   rec.GPS.setX(mostRecentLongitude);
-  // Serial.println(millis());
+  Serial.println(millis());
   rec.GPS.setY(mostRecentLatitude);
-  //Serial.println(millis());
+  Serial.println(millis());
   rec.GPS.setZ(mostRecentAltitude);
   
 }
-/*
+
 void setUTC(){
   rec.UTC = String(mostRecentHour)	+", ";//+ 
 	String(mostRecentMinute) 		+", "+
@@ -198,38 +198,40 @@ void setUTC(){
 	String(mostRecentDay)			+", "+
 	String(mostRecentYear);	
 }
-*/
+
 void gayWreck(){
-  // Serial.println("BNO:");
-  // Serial.println(millis());
+  Serial.println("BNO:");
+  Serial.println(millis());
   rec.Gyro.setX(gayDar.getGyroX());
-  //Serial.println(millis());
+  Serial.println(millis());
   rec.Gyro.setY(gayDar.getGyroY());
-  //Serial.println(millis());
+  Serial.println(millis());
   rec.Gyro.setZ(gayDar.getGyroZ());
-  
+  Serial.println(millis());
   rec.Acc.setX(gayDar.getAccelerationX());
-
+  Serial.println(millis());
   rec.Acc.setY(gayDar.getAccelerationY());
-
+  Serial.println(millis());
   rec.Acc.setZ(gayDar.getAccelerationZ());
-
+  Serial.println(millis());
 }
 
 void recGuy(){
-
+  Serial.println("BME: ");
+  Serial.println(millis());
   rec.tempI = guy.getTemperature();
-
+  Serial.println(millis());
   rec.humidity = guy.getHumidity();
-
+  Serial.println(millis());
 }
 
 void recDude(){
-
+  Serial.println("BMP");
+  Serial.println(millis());
   rec.tempE = dude.readTemperature();
-
+  Serial.println(millis());
   rec.pressure = dude.readPressure();
-
+  Serial.println(millis());
 }
 
 void recSensors(){
@@ -242,15 +244,15 @@ void recSensors(){
 }
 
 void output(){
-  rec.outCSV(); // replace -1 w/ current time from rework clock function
-  
-  outUTC();
-  //Serial.print("sat: ");
-  //Serial.println(mostRecentSIV);
+  //Serial1.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
+  Serial.println(rec.outCSV()); // replace -1 w/ current time from rework clock function
+  Serial.println("loop");
 }
 
 void blink(){
   LED_count+=rec.time.dt;
+  Serial.print("LED t: ");
+  Serial.println(LED_count);
 if(LEDs.getState()){
   if(LED_count>led_duration){
     LEDs.off();
@@ -331,64 +333,121 @@ void solenoidsTranslate(int instruction) {
 
     //delay(50);//for testing, we will use delay. For the flight code, don't
 }
+int lastDur = 0;
+
 
 int stateCheck(){
   static unsigned long int dur[4];
-  //int dih = rec.getDh();
-  //int h = rec.getH();
+  // int dih = rec.getDh();
+  // int h = rec.getH();
+
 
   // testing -------------------------------------- this never went into landing stage bc it was continuously decrasing
-  long h = 25000;
-  long dih = 0; 
+  //long h = 25000;
+  //long dih = 0;
   // -----------------------------------------------------
 
-// Serial.print("h:     ");
-// Serial.println(h);
-// Serial.print("t:     ");
-// Serial.println(t);
 
-  // checks values based on state: can move forward only one state at a time 
+  long t = millis();
+  static long h;
+  long dih = h;
+
+
+  Serial.println("h: ");
+  Serial.println(h);
+
+
+  h = -(77/56)*(t/1000)*((t/1000)-300);
+  dih = (h-dih)/2;
+
+
+Serial.print("h:     ");
+Serial.println(h);
+Serial.print("t:     ");
+Serial.println(t);
+
+
+
+
+  // checks values based on state: can move forward only one state at a time
   switch(rec.state){
     case 0: // ascent to target alt
-      if(h >= target_altitude){
-        dur[0] += rec.time.dt;
-      }else{dur[0]=0; dur[1]=0; dur[2] = 0;}
+    if(h > target_altitude){
+
+
+      if((t-lastDur) > 30000){
+        lastDur = 0;
+        rec.state = 1;
+        // return 1;
+      }
+    }
+    else{
+      lastDur = 0;
+    }
+    // if(h >= target_altitude){
+      //   dur[0] += rec.time.dt;
+      // }else{dur[0]=0; dur[1]=0; dur[2] = 0;}
       break;
+
 
     case 1: // target alt to descent
-      if(dih<0){
-        dur[1]+= rec.time.dt;
-      }else if(h < target_altitude){  // revert chack to state ascent
-        dur[1] = 0;
-        dur[0] += rec.time.dt;
-      }else{dur[0]=0; dur[1]=0; dur[2] = 0;}
+    if(dih < 0){
+      if((t-lastDur) > 30000){
+        lastDur = 0;
+        // return 2;
+        rec.state = 2;
+      }
+    }
+    else{
+      lastDur = 0;
+    }
+    // if(dih<0){
+      //   dur[1]+= rec.time.dt;
+      // }else if(h < target_altitude){  // revert chack to state ascent
+      //   dur[1] = 0;
+      //   dur[0] += rec.time.dt;
+      // }else{dur[0]=0; dur[1]=0; dur[2] = 0;}
       break;
+
 
     case 2: // descent to standby
-      if((dih > standby_thresh || dih < -standby_thresh) && h < target_altitude){
-        dur[2] += rec.time.dt;
-      }else if(dih<0){ // revert check to descent
-        dur[1] += rec.time.dt;
-        if(dur[1] > rec.time.dt*standby_exit_mod) // because negative dh could be higher than expected while in standby it must be continous for longer to reset progress towards standby
-          dur[2] = 0;
-      }else{dur[0]=0; dur[1]=0; dur[2] = 0;}
+      if(dih < 0.1 && dih > 0.1){
+        if((t-lastDur) > 100000){
+          lastDur = 0;
+          // return 3;
+          rec.state = 3;
+        }
+      }
+      else{
+        lastDur = 0;
+      }
+      // if((dih > standby_thresh || dih < -standby_thresh) && h < target_altitude){
+      //   dur[2] += rec.time.dt;
+      // }else if(dih<0){ // revert check to descent
+      //   dur[1] += rec.time.dt;
+      //   if(dur[1] > rec.time.dt*standby_exit_mod) // because negative dh could be higher than expected while in standby it must be continous for longer to reset progress towards standby
+      //     dur[2] = 0;
+      // }else{dur[0]=0; dur[1]=0; dur[2] = 0;}
       break;
+
 
     case 3: // standby operates seperate from others and only goes to target altitude
-      if(h > target_altitude){
-        dur[3] += rec.time.dt;
-      }else{dur[3]=0;}
-      if(dur[3] >= emergency_standby_exit){
-        return 1;
-      }
+      // if(h > target_altitude){
+      //   dur[3] += rec.time.dt;
+      // }else{dur[3]=0;}
+      // if(dur[3] >= emergency_standby_exit){
+      //   return 1;
+      // }
       break;
   }
 
-  for(int i = 2; i>=0;i--){
-    if(dur[i]>tReq[i]){ // prioritizes highest state 
-      return i;
-    }
-  }
+
+  // for(int i = 2; i>=0;i--){
+  //   Serial.println(dur[i]);
+  //   if(dur[i]>tReq[i]){ // prioritizes highest state
+  //     return i;
+  //   }
+  // }
   return 0;
 }
 
@@ -548,6 +607,7 @@ void pvtCallback(UBX_NAV_PVT_data_t *ubxDataStruct) {
     mostRecentLatitude = ((double)ubxDataStruct->lat) * pow(10, -7);
     mostRecentLongitude = ((double)ubxDataStruct->lon) * pow(10, -7);
     mostRecentAltitude = ubxDataStruct->height / 1000.0;
+      
     mostRecentYear = (int)ubxDataStruct->year;
     mostRecentMonth = (int)ubxDataStruct->month;
     mostRecentDay = (int)ubxDataStruct->day;
@@ -555,35 +615,6 @@ void pvtCallback(UBX_NAV_PVT_data_t *ubxDataStruct) {
     mostRecentMinute = (int)ubxDataStruct->min;
     mostRecentSecond = (int)ubxDataStruct->sec;
     mostRecentSIV = ubxDataStruct->numSV;
-}
-
-void outUTC(){
-  Serial.println("\n---------------------------------------------\n");
-  Serial.print(mostRecentHour);
-  Serial.print(", ");
-  Serial.print(mostRecentMinute);
-  Serial.print(", ");
-  Serial.print(mostRecentSecond);
-  Serial.print(", ");
-  Serial.print(mostRecentMonth);
-  Serial.print(", ");
-  Serial.print(mostRecentDay);
-  Serial.print(", ");
-  Serial.print(mostRecentYear);
-  Serial.print(", ");
-
-  Serial1.print(mostRecentHour);
-  Serial1.print(", ");
-  Serial1.print(mostRecentMinute);
-  Serial1.print(", ");
-  Serial1.print(mostRecentSecond);
-  Serial1.print(", ");
-  Serial1.print(mostRecentMonth);
-  Serial1.print(", ");
-  Serial1.print(mostRecentDay);
-  Serial1.print(", ");
-  Serial1.print(mostRecentYear);
-  Serial1.print(", ");
 }
 
 Error init() {
