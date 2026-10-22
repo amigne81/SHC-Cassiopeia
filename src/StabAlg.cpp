@@ -19,9 +19,10 @@
 #include <SparkFun_u-blox_GNSS_Arduino_Library.h>//M9N
 #include "SHC_BNO055.h"
 
-StabAlg::StabAlg(SFE_UBLOX_GNSS men, BNO055 bro) {
-    m9n = men;
-    bno = bro;
+StabAlg::StabAlg(SFE_UBLOX_GNSS& men, BNO055& bro) 
+        : m9n(men), bno(bro){
+    //m9n = men;//copy of men
+    //bno = bro;//copy of bro
 
     double previousAngularPos = bno.getOrientationX();//Sam? Do I need to run bno.prefetchData()?
 
@@ -116,8 +117,9 @@ int StabAlg::autoTargetRun(double minuteUpdate) {
         //Setting up the angularPos and the error term
     bno.prefetchData();//Sam??? Do I need this here?
     angularPos = bno.getOrientationX();
-    //Fixing wraparound problem
+
     error = angularPos-(targetValue+30);
+    //Fixing wraparound problem    
     if (error>180) {
         error = error-360;
     }
@@ -137,9 +139,8 @@ int StabAlg::autoTargetRun(double minuteUpdate) {
     derivative = ((deltaDer)/(currTime-previousTime))*1000;//using seconds, not milliseconds
 
     previousError = error;
-
         //Accounting for time gone by
-    unsigned long k = previousTime;
+    unsigned long k = previousTime;//accounts for the full interval of time
     previousTime = currTime;
 
     output = (Kp * error) + (Kd * derivative);
@@ -172,8 +173,8 @@ double StabAlg::findNewTarget() {
     //actial values from the M9N
     int hour = m9n.getHour();
     int min = m9n.getMinute();
-    double latitude = m9n.getLatitude();//degrees
-    double longitude = m9n.getLongitude();//degrees
+    double latitude = m9n.getLatitude()*0.0000001;//degrees
+    double longitude = m9n.getLongitude()*0.0000001;//degrees
     
     //int GHT = -5;//Central Daylight Time
     int GHT = 0;//the M9N uses UTC as its time zone :(
@@ -229,7 +230,7 @@ void StabAlg::solenoidTranslate(int instruction) {
     if (instruction==CLOCKWISE) {//turn on 'right' solenoid
         digitalWrite(3,LOW);
         digitalWrite(4,HIGH);
-        Serial.println("clockwise");
+        Serial.println("wise");
     }
     else if (instruction==COUNTERCLOCKWISE) {//turn on 'left' solenoid
         digitalWrite(4, LOW);

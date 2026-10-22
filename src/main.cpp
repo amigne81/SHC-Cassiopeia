@@ -75,12 +75,10 @@ void recSensors();
 void setupSensors();
 void blink();
 // stabilize test copy
-void Stabinit();
 void Stabtest();
 void testSolenoids();
 void testTargetValueInfo();
 void testOrientation();
-void solenoidsTranslate(int);
 void chirp(int);
 void recMen();
 void outMen();
