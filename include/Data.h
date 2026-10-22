@@ -16,7 +16,6 @@ struct Data{
 	int state;
 
 	Data();
-	Data(SFE_UBLOX_GNSS*);
 
 	int getTempI();
 	int getTempE();

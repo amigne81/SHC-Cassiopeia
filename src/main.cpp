@@ -225,7 +225,8 @@ void output(){
 
 void blink(){
   LED_count+=rec.time.dt;
-
+  Serial.print("LED t: ");
+  Serial.println(LED_count);
 if(LEDs.getState()){
   if(LED_count>led_duration){
     LEDs.off();
@@ -389,10 +390,9 @@ void setupSensors(){
   }
 
   delay(1500);
-  LEDs.off();
-  delay(3000);
   LEDs.on();
   delay(500);
+  LEDs.off(); 
 
 Serial.println("M9N checked.");
   // BNO055 bad
@@ -411,10 +411,9 @@ Serial.println("M9N checked.");
   }
 
   delay(1500);
-  LEDs.off();
-  delay(3000);
   LEDs.on();
   delay(500);
+  LEDs.off();
 
   //BME280 (evil dastardly bad guy)
   Serial.println("BNO checked.");
@@ -434,11 +433,11 @@ Serial.println("M9N checked.");
     chirp(5);
   }
 
+
   delay(1500);
-  LEDs.off();
-  delay(3000);
   LEDs.on();
   delay(500);
+  LEDs.off();
 
   Serial.println("BME checked.");
   delay(500);
@@ -464,11 +463,12 @@ Serial.println("M9N checked.");
   chirp(5);
   }
 
+  
   delay(1500);
-  LEDs.off();
-  delay(3000);
   LEDs.on();
   delay(500);
+  LEDs.off();
+
 /*
   // INA260 also evil  bad never ever ever again
   power = Adafruit_INA260();
