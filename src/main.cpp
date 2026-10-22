@@ -178,13 +178,17 @@ void gayWreck(){
 }
 
 void outCloset(){
-  Serial.println("Gyro X: " + int(gayDar.getGyroX()));
-  Serial.println("Gyro Y: " + int(gayDar.getGyroY()));
-  Serial.println("Gyro Z: " + int(gayDar.getGyroZ()));
+  Serial.println("Gyro X: " + String(gayDar.getOrientationX()));
+  Serial.println("Gyro Y: " + String(gayDar.getOrientationY()));
+  Serial.println("Gyro Z: " + String(gayDar.getOrientationZ()));
+  
+  Serial.println("Gyro X: " + String(gayDar.getGyroX()));
+  Serial.println("Gyro Y: " + String(gayDar.getGyroY()));
+  Serial.println("Gyro Z: " + String(gayDar.getGyroZ()));
 
-  Serial.println("Acc X: " + int(gayDar.getAccelerationX()));
-  Serial.println("Acc Y: " + int(gayDar.getAccelerationY()));
-  Serial.println("ACC Z: " + int(gayDar.getAccelerationZ()));
+  Serial.println("Acc X: " + String(gayDar.getAccelerationX()));
+  Serial.println("Acc Y: " + String(gayDar.getAccelerationY()));
+  Serial.println("ACC Z: " + String(gayDar.getAccelerationZ()));
 }
 
 void recGuy(){

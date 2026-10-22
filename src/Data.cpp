@@ -50,8 +50,8 @@ GYRO_X, GYRO_Y, GYRO_Z, GPS_LAT, GPS_LONG, GPS_ALT
 
 String Data::outCSV(){
 	Data::count++;
-	return Data::ID + ", time: " + String(time.t()) + ", UTC: " + time.UTC() + ", PCKCount:" +
-	String(Data::count) + ", Software State:" + String(Data::state)+ ", Atitude:" + String(Data::GPS.getZ()) +  ", Temp:" + 
-	String(Data::tempI) + ", Acceleration: " + Data::Acc.outCSV() + ", Gyro:" + Data::Gyro.outCSV() + ", GPS: " + Data::GPS.outCSV() + ", Pressure:" +
-	String(pressure) + ", Humidity:" + String(humidity);
+	return Data::ID + ", " + String(time.t()) + ", " + time.UTC() +
+	String(Data::count) + ", " + String(Data::state)+ ", " + String(Data::GPS.getZ()) +  ", " + 
+	String(Data::tempI) + ", " + Data::Acc.outCSV() + ", " + Data::Gyro.outCSV() + ", " + Data::GPS.outCSV() + ", " +
+	String(pressure) + ", " + String(humidity);
 }

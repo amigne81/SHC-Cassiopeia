@@ -30,7 +30,7 @@ void setup() {
 
   //GPSinit();
   BNOinit();
-  BMEinit();
+  //BMEinit();
 }
 
 //to test indiviudally comment out the ___test() and ___init() above
@@ -39,8 +39,8 @@ void loop() {
   Serial.println("\n");
   BNOtest();
   Serial.println("\n");
-  BMEtest();
-  Serial.println("\n");
+  //BMEtest();
+ // Serial.println("\n");
   delay(3000);
 }
 
