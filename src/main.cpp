@@ -35,6 +35,7 @@ const int attempt_num = 100;        // number of attempts made before giving up 
 const int target_altitude = 20000;
 const int standby_thresh = 1;
 const int standby_exit_mod = 8; 
+int LED_count;
 int nError = 0;
 bool erMen = true, erGay = true, erGuy = true, erDude = true, erPower = true;
 
@@ -226,17 +227,18 @@ void output(){
 }
 
 void blink(){
-  static int t;
-  t+=rec.time.dt;
+  LED_count+=rec.time.dt;
 
 if(LEDs.getState()){
-  if(t>led_duration){
+  if(LED_count>led_duration){
     LEDs.off();
-    t = 0;
+    Serial.println("off");
+    LED_count = 0;
   } 
-}else if(t>led_delay){
+}else if(LED_count>led_delay){
     LEDs.on();
-    t = 0;
+    Serial.println("on");
+    LED_count = 0;
   }
 }
 
