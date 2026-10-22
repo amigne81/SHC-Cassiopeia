@@ -78,8 +78,6 @@ void outDude();
 int stateCheck();
 
 void setup() {
-
-
   Serial.begin(9600);
   delay(750);
   Serial.println("Program start0\n");
@@ -102,10 +100,7 @@ void loop() {
   rec.state = stateCheck();
   recSensors();
 
-  outMen();
   outCloset();
-  outGuy();
-  outDude();
 
   switch(rec.state){
     case 0:
