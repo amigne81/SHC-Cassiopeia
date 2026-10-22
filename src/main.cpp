@@ -178,9 +178,9 @@ void gayWreck(){
 }
 
 void outCloset(){
-  Serial.println("Gyro X: " + String(gayDar.getOrientationX()));
-  Serial.println("Gyro Y: " + String(gayDar.getOrientationY()));
-  Serial.println("Gyro Z: " + String(gayDar.getOrientationZ()));
+  Serial.println("orient X: " + String(gayDar.getOrientationX()));
+  Serial.println("orient Y: " + String(gayDar.getOrientationY()));
+  Serial.println("orient Z: " + String(gayDar.getOrientationZ()));
   
   Serial.println("Gyro X: " + String(gayDar.getGyroX()));
   Serial.println("Gyro Y: " + String(gayDar.getGyroY()));
@@ -342,7 +342,7 @@ int stateCheck(){
       }else{dur[0]=0; dur[1]=0; dur[2] = 0;}
 
     case 2: // descent to standby
-      if(dih > standby_thresh || dih < -standby_thresh){
+      if((dih > standby_thresh || dih < -standby_thresh) && h < target_altit){
         dur[2] += rec.time.dt;
       }else if(dih<0){ // revert check to descent
         dur[1] += rec.time.dt;
