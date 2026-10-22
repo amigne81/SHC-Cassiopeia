@@ -99,8 +99,6 @@ void loop() {
   rec.state = stateCheck();
   recSensors();
 
-  outCloset();
-
   switch(rec.state){
     case 0:
       below_target();
@@ -220,9 +218,9 @@ void recSensors(){
 }
 
 void output(){
-  Serial1.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
-  Serial.println(rec.outCSV()); // replace -1 w/ current time from rework clock function
-  Serial.println();
+  //Serial1.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
+  //Serial.println(rec.outCSV()); // replace -1 w/ current time from rework clock function
+  Serial.println("loop");
 }
 
 void blink(){
