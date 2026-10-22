@@ -14,7 +14,6 @@ struct Data{
 	Clock time;
 	int tempI, tempE, pressure, humidity;
 	int state;
-	String UTC;
 
 	Data();
 
@@ -29,7 +28,7 @@ struct Data{
 	long getH();
 	long getDh();
 
-	String outCSV();
+	void outCSV();
 
 	private:
 	const int l = 5;

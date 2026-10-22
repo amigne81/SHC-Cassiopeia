@@ -18,6 +18,6 @@ class store3Ddouble{
 	double getY();
 	double getZ();
 	// outputs values in csv format
-	String outCSV();
+	void outCSV();
 };
 #endif

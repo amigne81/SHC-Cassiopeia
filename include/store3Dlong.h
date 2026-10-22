@@ -18,6 +18,6 @@ class store3Dlong{
 	long getY();
 	long getZ();
 	// outputs values in csv format
-	String outCSV();
+	void outCSV();
 };
 #endif

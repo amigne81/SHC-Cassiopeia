@@ -27,7 +27,19 @@ long store3Dlong::getZ(){
 	return z;
 }
 
-String store3Dlong::outCSV(){
-	return String(x,l) + ", " + String(y,l) + ", " + String(z,l)+ ", ";
+void store3Dlong::outCSV(){
+	Serial1.print(x);
+	Serial1.print(", ");
+	Serial1.print(y);
+	Serial1.print(", ");
+	Serial1.print(z);
+	Serial1.print(", ");
+
+	Serial.print(x);
+	Serial.print(", ");
+	Serial.print(y);
+	Serial.print(", ");
+	Serial.print(z);
+	Serial.print(", ");
 }
 

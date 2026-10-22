@@ -90,6 +90,8 @@ void recGuy();
 void outGuy();
 void recDude();
 void outDude();
+void outUTC();
+
 Error init();
 
 int stateCheck();
@@ -142,9 +144,6 @@ void loop() {
   if(rec.state!=3){
     blink();
   }
-
-  Serial.print("state: ");
-  Serial.println(rec.state);
   
   output();
   // delay(5000) // for testing
@@ -181,16 +180,16 @@ void fetch(){
 }
 
 void recMen(){
-  Serial.println("M9N");
-  Serial.println(millis());
+  // Serial.println("M9N");
+  // Serial.println(millis());
   rec.GPS.setX(mostRecentLongitude);
-  Serial.println(millis());
+  // Serial.println(millis());
   rec.GPS.setY(mostRecentLatitude);
-  Serial.println(millis());
+  //Serial.println(millis());
   rec.GPS.setZ(mostRecentAltitude);
   
 }
-
+/*
 void setUTC(){
   rec.UTC = String(mostRecentHour)	+", ";//+ 
 	String(mostRecentMinute) 		+", "+
@@ -199,40 +198,38 @@ void setUTC(){
 	String(mostRecentDay)			+", "+
 	String(mostRecentYear);	
 }
-
+*/
 void gayWreck(){
-  Serial.println("BNO:");
-  Serial.println(millis());
+  // Serial.println("BNO:");
+  // Serial.println(millis());
   rec.Gyro.setX(gayDar.getGyroX());
-  Serial.println(millis());
+  //Serial.println(millis());
   rec.Gyro.setY(gayDar.getGyroY());
-  Serial.println(millis());
+  //Serial.println(millis());
   rec.Gyro.setZ(gayDar.getGyroZ());
-  Serial.println(millis());
+  
   rec.Acc.setX(gayDar.getAccelerationX());
-  Serial.println(millis());
+
   rec.Acc.setY(gayDar.getAccelerationY());
-  Serial.println(millis());
+
   rec.Acc.setZ(gayDar.getAccelerationZ());
-  Serial.println(millis());
+
 }
 
 void recGuy(){
-  Serial.println("BME: ");
-  Serial.println(millis());
+
   rec.tempI = guy.getTemperature();
-  Serial.println(millis());
+
   rec.humidity = guy.getHumidity();
-  Serial.println(millis());
+
 }
 
 void recDude(){
-  Serial.println("BMP");
-  Serial.println(millis());
+
   rec.tempE = dude.readTemperature();
-  Serial.println(millis());
+
   rec.pressure = dude.readPressure();
-  Serial.println(millis());
+
 }
 
 void recSensors(){
@@ -245,15 +242,15 @@ void recSensors(){
 }
 
 void output(){
-  //Serial1.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
-  //Serial.println(rec.outCSV()); // replace -1 w/ current time from rework clock function
-  Serial.println("loop");
+  rec.outCSV(); // replace -1 w/ current time from rework clock function
+  
+  outUTC();
+  //Serial.print("sat: ");
+  //Serial.println(mostRecentSIV);
 }
 
 void blink(){
   LED_count+=rec.time.dt;
-  Serial.print("LED t: ");
-  Serial.println(LED_count);
 if(LEDs.getState()){
   if(LED_count>led_duration){
     LEDs.off();
@@ -551,7 +548,6 @@ void pvtCallback(UBX_NAV_PVT_data_t *ubxDataStruct) {
     mostRecentLatitude = ((double)ubxDataStruct->lat) * pow(10, -7);
     mostRecentLongitude = ((double)ubxDataStruct->lon) * pow(10, -7);
     mostRecentAltitude = ubxDataStruct->height / 1000.0;
-      
     mostRecentYear = (int)ubxDataStruct->year;
     mostRecentMonth = (int)ubxDataStruct->month;
     mostRecentDay = (int)ubxDataStruct->day;
@@ -559,6 +555,35 @@ void pvtCallback(UBX_NAV_PVT_data_t *ubxDataStruct) {
     mostRecentMinute = (int)ubxDataStruct->min;
     mostRecentSecond = (int)ubxDataStruct->sec;
     mostRecentSIV = ubxDataStruct->numSV;
+}
+
+void outUTC(){
+  Serial.println("\n---------------------------------------------\n");
+  Serial.print(mostRecentHour);
+  Serial.print(", ");
+  Serial.print(mostRecentMinute);
+  Serial.print(", ");
+  Serial.print(mostRecentSecond);
+  Serial.print(", ");
+  Serial.print(mostRecentMonth);
+  Serial.print(", ");
+  Serial.print(mostRecentDay);
+  Serial.print(", ");
+  Serial.print(mostRecentYear);
+  Serial.print(", ");
+
+  Serial1.print(mostRecentHour);
+  Serial1.print(", ");
+  Serial1.print(mostRecentMinute);
+  Serial1.print(", ");
+  Serial1.print(mostRecentSecond);
+  Serial1.print(", ");
+  Serial1.print(mostRecentMonth);
+  Serial1.print(", ");
+  Serial1.print(mostRecentDay);
+  Serial1.print(", ");
+  Serial1.print(mostRecentYear);
+  Serial1.print(", ");
 }
 
 Error init() {

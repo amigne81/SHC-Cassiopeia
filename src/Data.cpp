@@ -44,11 +44,42 @@ GYRO_X, GYRO_Y, GYRO_Z, GPS_LAT, GPS_LONG, GPS_ALT
 //the gap with double ,'s is from teh UTC time, this probably needs to be fixed any way becuase there is just so much
 //values on SD card are not updating
 
-String Data::outCSV(){
+void Data::outCSV(){
 	Data::count++;
-	Serial.println(time.UTC());
-	return Data::ID + ", " + String(time.t()) + ", " + UTC +
-	String(Data::count) + ", " + String(Data::state)+ ", " + String(Data::GPS.getZ()) +  ", " + 
-	String(Data::tempI) + ", " + Data::Acc.outCSV() + ", " + Data::Gyro.outCSV() + ", " + Data::GPS.outCSV() + ", " +
-	String(pressure) + ", " + String(humidity);
+	Serial1.print(Data::ID);
+	Serial1.print(", ");
+	Serial1.print(time.t());
+	Serial1.print(", ");
+	Serial1.print(Data::count);
+	Serial1.print(", ");
+	Serial1.print(Data::state);
+	Serial1.print(", ");
+	Serial1.print(Data::GPS.getZ());
+	Serial1.print(", ");
+	Serial1.print(Data::tempI);
+	Serial1.print(", ");
+	Data::Acc.outCSV();
+	Serial1.print(", ");
+	Data::Gyro.outCSV();
+	Data::GPS.outCSV();
+	Serial1.print(pressure);
+	Serial1.print(humidity);
+
+	Serial.print(Data::ID);
+	Serial.print(", ");
+	Serial.print(time.t());
+	Serial.print(", ");
+	Serial.print(Data::count);
+	Serial.print(", ");
+	Serial.print(Data::state);
+	Serial.print(", ");
+	Serial.print(Data::GPS.getZ());
+	Serial.print(", ");
+	Serial.print(Data::tempI);
+	Serial.print(", ");
+	Data::outCSV();
+	Data::Gyro.outCSV();
+	Data::GPS.outCSV();
+	Serial.print(pressure);
+	Serial.print(humidity);
 }

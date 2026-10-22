@@ -8,14 +8,12 @@
 class Clock {
 	private: 
 	unsigned long int previous = 0;
-	String utc;
 	const int l = 5;
  
 
 	public:	
 	unsigned long int dt;
 	unsigned long int t();
-	String UTC();
 	void setdt();
 
 };
