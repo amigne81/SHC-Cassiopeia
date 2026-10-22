@@ -10,13 +10,13 @@ Clock::Clock(SFE_UBLOX_GNSS* a){
 }
 
 void Clock::setUTC(){
-	utc = String(p->getHour(),l)	+", "+ 
-	String(p->getMinute(),l) 		+", "+
-	String(p->getSecond(),l) 		+", "+
-	p->getTimeOfWeek() 				+", "+
-	p->getMonth() 					+", "+
-	String(p->getDay(),l)			+", "+
-	String(p->getYear(),l)			+", ";
+	utc = String(p->getHour(),l)	+", ";//+ 
+	//String(p->getMinute(),l) 		+", "+
+	//String(p->getSecond(),l) 		+", "+
+	//String(p->getTimeOfWeek()) 		+", "+
+	//String(p->getMonth()) 			+", "+
+	//String(p->getDay(),l)			+", "+
+	//String(p->getYear(),l)			+", ";
 }
 
 unsigned long int Clock::t(){
