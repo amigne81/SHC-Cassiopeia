@@ -2,7 +2,14 @@
 
 #include "Clock.h"
 
-void Clock::setUTC(SFE_UBLOX_GNSS* p){
+Clock::Clock(){
+}
+
+Clock::Clock(SFE_UBLOX_GNSS* a){
+	p = a;
+}
+
+void Clock::setUTC(){
 	utc = String(p->getHour(),l)	+", "+ 
 	String(p->getMinute(),l) 		+", "+
 	String(p->getSecond(),l) 		+", "+
@@ -17,6 +24,7 @@ unsigned long int Clock::t(){
 }
 
 String Clock::UTC(){
+	setUTC();
 	return utc;
 }
 

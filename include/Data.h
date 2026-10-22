@@ -15,6 +15,9 @@ struct Data{
 	int tempI, tempE, pressure, humidity;
 	int state;
 
+	Data();
+	Data(SFE_UBLOX_GNSS*);
+
 	int getTempI();
 	int getTempE();
 	double getAccX();

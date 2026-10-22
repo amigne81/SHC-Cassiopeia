@@ -1,6 +1,13 @@
 
 #include "Data.h"
 
+Data::Data(){
+}
+
+Data::Data(SFE_UBLOX_GNSS* a){
+	Clock time = Clock(a);
+}
+
 int Data::getTempE(){
 	return Data::tempE*1;
 }

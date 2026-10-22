@@ -20,7 +20,7 @@ Adafruit_BMP3XX dude = Adafruit_BMP3XX();
 //Adafruit_INA260 power;
 
 // global object initalization
-Data rec;
+Data rec = Data(&hotMenInYourArea);
 StabAlg TheUK = StabAlg(hotMenInYourArea, gayDar);
 LED LEDs(2);
 
@@ -159,7 +159,6 @@ void recMen(){
   rec.GPS.setX(hotMenInYourArea.getLongitude());
   rec.GPS.setY(hotMenInYourArea.getLatitude());
   rec.GPS.setZ(hotMenInYourArea.getAltitude());
-  rec.time.setUTC(&hotMenInYourArea);
 }
 
 void outMen(){
