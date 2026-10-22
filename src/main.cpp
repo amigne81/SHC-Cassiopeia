@@ -20,11 +20,9 @@ Adafruit_BMP3XX dude = Adafruit_BMP3XX();
 //Adafruit_INA260 power;
 
 // global object initalization
-Data rec = Data(&hotMenInYourArea);
+Data rec = Data();
 StabAlg TheUK = StabAlg(hotMenInYourArea, gayDar);
 LED LEDs(2);
-
-
 
 // global variable intialization
 const int solenoid_pin1 = 3;
@@ -100,6 +98,8 @@ void loop() {
   rec.time.setdt();
   rec.state = stateCheck();
   recSensors();
+
+  outCloset();
 
   switch(rec.state){
     case 0:
@@ -220,8 +220,7 @@ void recSensors(){
 }
 
 void output(){
-  Serial.println("HERE");
-  //Serial1.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
+  Serial1.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
   Serial.println(rec.outCSV()); // replace -1 w/ current time from rework clock function
   Serial.println();
 }
@@ -390,7 +389,6 @@ void setupSensors(){
   hotMenInYourArea.setI2COutput(COM_TYPE_UBX);
   hotMenInYourArea.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT);
   }
-  Serial.println("M9N checked.");
 
   delay(1500);
   LEDs.off();
@@ -398,7 +396,30 @@ void setupSensors(){
   LEDs.on();
   delay(500);
 
-//BME280 (evil dastardly bad guy)
+Serial.println("M9N checked.");
+  // BNO055 bad
+  for(int i = 0; (i<= attempt_num) && (gayDar.init() == BNO_ERROR); i++){
+    Serial.println(" BNO055 not found   >:(");
+    if(i==attempt_num){
+      erGay = false;
+      Serial.println(" BNO055 failed to initialize.  IE2");
+      Serial1.print("BNO055-1, ");
+    }
+    delay(attempt_delay);
+  }
+
+  if(erGay){
+    chirp(5);
+  }
+
+  delay(1500);
+  LEDs.off();
+  delay(3000);
+  LEDs.on();
+  delay(500);
+
+  //BME280 (evil dastardly bad guy)
+  Serial.println("BNO checked.");
   for(int i = 0; (i<= attempt_num) && (guy.init() == BME_ERROR); i++){
     Serial.println(" BME280 not found  )=:");
     delay(100);
@@ -422,31 +443,7 @@ void setupSensors(){
   delay(500);
 
   Serial.println("BME checked.");
-
-  // BNO055 bad
-  for(int i = 0; (i<= attempt_num) && (gayDar.init() == BNO_ERROR); i++){
-    Serial.println(" BNO055 not found   >:(");
-    if(i==attempt_num){
-      erGay = false;
-      Serial.println(" BNO055 failed to initialize.  IE2");
-      Serial1.print("BNO055-1, ");
-    }
-    delay(attempt_delay);
-  }
-
-  if(erGay){
-    chirp(5);
-  }
-
-  Serial.println("BNO checked");
-
-  delay(1500);
-  LEDs.off();
-  delay(3000);
-  LEDs.on();
   delay(500);
-
-
   //BMP3 good boy
   for(int i = 0; (i<= attempt_num) && !(dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1)); i++){
     // Serial.print("the bmp is begingin? - ");
