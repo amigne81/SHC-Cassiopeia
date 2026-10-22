@@ -42,7 +42,7 @@ bool erMen = true, erGay = true, erGuy = true, erDude = true, erPower = true;
 const unsigned long int tReq[3] = {20000,30000,60000};
 const int emergency_standby_exit= 5000; // time to exit if in target alt while in standby state (milliseconds)
 const int attempt_delay = 150; // delay between attempts of sensor initialization
-const int led_delay = 660;    // delay is between flashes, duration is the length of flashes
+const int led_delay = 460;    // delay is between flashes, duration is the length of flashes
 const int led_duration = 40;
 const int standby_delay = 3000;
 
@@ -78,8 +78,6 @@ void outDude();
 int stateCheck();
 
 void setup() {
-
-
   Serial.begin(9600);
   delay(750);
   Serial.println("Program start0\n");
@@ -320,13 +318,9 @@ int stateCheck(){
   //int h = rec.getH();
 
   // testing -------------------------------------- this never went into landing stage bc it was continuously decrasing
-  long t = millis();
-  static long h;
-  long dih = h;
-
-  // h = -(77/56)*(t/1000)*((t/1000)-300);
-  // dih = (h-dih)/2;
-// -----------------------------------------------------
+  long h = 25000;
+  long dih = 0; 
+  // -----------------------------------------------------
 
 // Serial.print("h:     ");
 // Serial.println(h);

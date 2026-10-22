@@ -19,39 +19,10 @@ void setup() {
 }
 
 void loop() {
-    // ghj.prefetchData();
+    // BBB.prefetchData();
 
     Stabtest();
-    // stab.update(10);
-}
-
-void testSolenoids() {
-    delay(1000);
-
-    digitalWrite(3, HIGH);
-    delay(100);
-    digitalWrite(3, LOW);
-
-    delay(1000);
-
-    digitalWrite(4, HIGH);
-    delay(100);
-    digitalWrite(4, LOW);
-}
-
-void testTargetValueInfo() {
-    //Testing Target Value
-    Serial.print("Target value: ");
-    Serial.println(stab.findNewTarget());
-
-    Serial.println("\n Dirrection: ");
-    Serial.println(stab.autoTargetRun(10));
-
-    Serial.println("\n Hour: ");
-    Serial.println(MMM.getHour());
-
-    Serial.println("\n Minute: ");
-    Serial.println(MMM.getMinute());
+    // stab.update(1);
 }
 
 //The below test simulates update(), the method that will be used during flight
@@ -93,6 +64,20 @@ void Stabtest() {//adjusts the targetValue to see that nothing breaks. Yes, it u
   stab.updateTestRun();
 }
 
+void testSolenoids() {
+    delay(1000);
+
+    digitalWrite(3, HIGH);
+    delay(100);
+    digitalWrite(3, LOW);
+
+    delay(1000);
+
+    digitalWrite(4, HIGH);
+    delay(100);
+    digitalWrite(4, LOW);
+}
+
 void testOrientation() {
 
     //   Serial.print("Accel: (" + String(BBB.getAccelerationX()));
@@ -104,4 +89,19 @@ void testOrientation() {
       Serial.print("Orient: (" + String(BBB.getOrientationX()));
     //   Serial.print(", " + String(BBB.getOrientationY()));
     //   Serial.println(", " + String(BBB.getOrientationZ()) + ")");
+}
+
+void testTargetValueInfo() {
+    //Testing Target Value
+    Serial.print("Target value: ");
+    Serial.println(stab.findNewTarget());
+
+    Serial.println("\n Dirrection: ");
+    Serial.println(stab.autoTargetRun(10));
+
+    Serial.println("\n Hour: ");
+    Serial.println(MMM.getHour());
+
+    Serial.println("\n Minute: ");
+    Serial.println(MMM.getMinute());
 }
