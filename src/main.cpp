@@ -178,12 +178,12 @@ void fetch(){
 }
 
 void recMen(){
-  Serial.println("M9N");
-  Serial.println(millis());
+  // Serial.println("M9N");
+  // Serial.println(millis());
   rec.GPS.setX(mostRecentLongitude);
-  Serial.println(millis());
+  // Serial.println(millis());
   rec.GPS.setY(mostRecentLatitude);
-  Serial.println(millis());
+  // Serial.println(millis());
   rec.GPS.setZ(mostRecentAltitude);
   
 }
@@ -198,38 +198,38 @@ void setUTC(){
 }
 
 void gayWreck(){
-  Serial.println("BNO:");
-  Serial.println(millis());
+  // Serial.println("BNO:");
+  // Serial.println(millis());
   rec.Gyro.setX(gayDar.getGyroX());
-  Serial.println(millis());
+  // Serial.println(millis());
   rec.Gyro.setY(gayDar.getGyroY());
-  Serial.println(millis());
+  // Serial.println(millis());
   rec.Gyro.setZ(gayDar.getGyroZ());
-  Serial.println(millis());
+  // Serial.println(millis());
   rec.Acc.setX(gayDar.getAccelerationX());
-  Serial.println(millis());
+  // Serial.println(millis());
   rec.Acc.setY(gayDar.getAccelerationY());
-  Serial.println(millis());
+  // Serial.println(millis());
   rec.Acc.setZ(gayDar.getAccelerationZ());
-  Serial.println(millis());
+  // Serial.println(millis());
 }
 
 void recGuy(){
-  Serial.println("BME: ");
-  Serial.println(millis());
+  // Serial.println("BME: ");
+  // Serial.println(millis());
   rec.tempI = guy.getTemperature();
-  Serial.println(millis());
+  // Serial.println(millis());
   rec.humidity = guy.getHumidity();
-  Serial.println(millis());
+  // Serial.println(millis());
 }
 
 void recDude(){
-  Serial.println("BMP");
-  Serial.println(millis());
+  // Serial.println("BMP");
+  // Serial.println(millis());
   rec.tempE = dude.readTemperature();
-  Serial.println(millis());
+  // Serial.println(millis());
   rec.pressure = dude.readPressure();
-  Serial.println(millis());
+  // Serial.println(millis());
 }
 
 void recSensors(){
@@ -249,8 +249,8 @@ void output(){
 
 void blink(){
   LED_count+=rec.time.dt;
-  Serial.print("LED t: ");
-  Serial.println(LED_count);
+  // Serial.print("LED t: ");
+  // Serial.println(LED_count);
 if(LEDs.getState()){
   if(LED_count>led_duration){
     LEDs.off();
@@ -351,11 +351,7 @@ int stateCheck(){
   long dih = h;
 
 
-  Serial.println("h: ");
-  Serial.println(h);
-
-
-  h = -(77/56)*(t/1000)*((t/1000)-300);
+  h = (-(77/56)*(t/1000)*((t/1000)-300));
   dih = (h-dih)/2;
 
 
@@ -363,6 +359,9 @@ Serial.print("h:     ");
 Serial.println(h);
 Serial.print("t:     ");
 Serial.println(t);
+Serial.println(t-lastDur);
+Serial.println(dih);
+
 
 
 
@@ -371,33 +370,30 @@ Serial.println(t);
   switch(rec.state){
     case 0: // ascent to target alt
     if(h > target_altitude){
-
-
       if((t-lastDur) > 30000){
-        lastDur = 0;
+        lastDur = t;
         rec.state = 1;
-        // return 1;
+        return 1;
       }
     }
     else{
-      lastDur = 0;
+      lastDur = t;
     }
-    // if(h >= target_altitude){
-      //   dur[0] += rec.time.dt;
-      // }else{dur[0]=0; dur[1]=0; dur[2] = 0;}
       break;
 
 
     case 1: // target alt to descent
     if(dih < 0){
+      Serial.println("AAAAAAAAAAAAAAAAAAAAA");
       if((t-lastDur) > 30000){
-        lastDur = 0;
+        lastDur = t;
         // return 2;
         rec.state = 2;
+        return 2;
       }
     }
     else{
-      lastDur = 0;
+      lastDur = t;
     }
     // if(dih<0){
       //   dur[1]+= rec.time.dt;
@@ -411,13 +407,14 @@ Serial.println(t);
     case 2: // descent to standby
       if(dih < 0.1 && dih > 0.1){
         if((t-lastDur) > 100000){
-          lastDur = 0;
+          lastDur = t;
           // return 3;
           rec.state = 3;
+          return 3;
         }
       }
       else{
-        lastDur = 0;
+        lastDur = t;
       }
       // if((dih > standby_thresh || dih < -standby_thresh) && h < target_altitude){
       //   dur[2] += rec.time.dt;
@@ -436,6 +433,17 @@ Serial.println(t);
       // if(dur[3] >= emergency_standby_exit){
       //   return 1;
       // }
+      if(dih > 1){
+        if((t-lastDur) > 100000){
+          lastDur = t;
+          // return 3;
+          rec.state = 0;
+          return 0;
+        }
+      }
+      else{
+        lastDur = t;
+      }
       break;
   }
 
@@ -446,7 +454,7 @@ Serial.println(t);
   //     return i;
   //   }
   // }
-  return 0;
+  return rec.state;
 }
 
 void setupSensors(){
