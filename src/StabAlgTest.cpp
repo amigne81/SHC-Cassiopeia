@@ -25,11 +25,9 @@ void setup() {
 void loop() {
     BBB.prefetchData();
 
-
-    //Stabtest();
-    // stab.update(1);
-    testTargetValueInfo();
-    //Stabtest();
+    // testTargetValueInfo();
+    // testSolenoids();
+    stab.updateTestRun();
 }
 
 void testTargetValueInfo() {
