@@ -10,7 +10,7 @@
  * With that in mind, comment out any sensor tests and inits for sensors you do not currently have connected. 
 */
 
-//M9N gps = M9N();
+// M9N gps = M9N();
 BNO055 mybno = BNO055();
 SHC_BME280 press = SHC_BME280();
 
@@ -29,15 +29,16 @@ void setup() {
   Serial.begin(9600);
 
   //GPSinit();
-  BNOinit();
+  //BNOinit();
   //BMEinit();
+
 }
 
 //to test indiviudally comment out the ___test() and ___init() above
 void loop() {
-  //GPStest();
+  GPStest();
   Serial.println("\n");
-  BNOtest();
+  // BNOtest();
   Serial.println("\n");
   //BMEtest();
  // Serial.println("\n");

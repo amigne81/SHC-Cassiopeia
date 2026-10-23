@@ -5,6 +5,9 @@
 #include "SHC_BNO055.h"
 
 void Stabtest();
+void testTargetValueInfo();
+void testSolenoids();
+void testOrientation();
 
 SFE_UBLOX_GNSS MMM = SFE_UBLOX_GNSS();//M9N
 BNO055 BBB = BNO055();//BNO
@@ -14,15 +17,43 @@ const int Orientation_delay = 50;//ms
 void setup() {
     Wire.begin();
     Serial.begin(9600);
+    MMM.begin();
 
     BBB.init();//bno uses SHC
 }
 
 void loop() {
-    // BBB.prefetchData();
+    BBB.prefetchData();
 
-    Stabtest();
+
+    //Stabtest();
     // stab.update(1);
+    testTargetValueInfo();
+    //Stabtest();
+}
+
+void testTargetValueInfo() {
+    //Testing Target Value
+
+    Serial.println("\n Hour: ");
+    Serial.println(MMM.getHour());
+
+    Serial.println("\n Minute: ");
+    Serial.println(MMM.getMinute());
+
+    Serial.println("\n Lat: ");
+    Serial.println(MMM.getLatitude());
+    
+    Serial.println("\n Long: ");
+    Serial.println(MMM.getLongitude());
+
+    Serial.println("Target value: ");
+    Serial.println(stab.findNewTarget());
+
+    // Serial.println("\n Direction: ");
+    // Serial.println(stab.autoTargetRun(1));
+
+    delay(5000);
 }
 
 //The below test simulates update(), the method that will be used during flight
@@ -89,19 +120,4 @@ void testOrientation() {
       Serial.print("Orient: (" + String(BBB.getOrientationX()));
     //   Serial.print(", " + String(BBB.getOrientationY()));
     //   Serial.println(", " + String(BBB.getOrientationZ()) + ")");
-}
-
-void testTargetValueInfo() {
-    //Testing Target Value
-    Serial.print("Target value: ");
-    Serial.println(stab.findNewTarget());
-
-    Serial.println("\n Dirrection: ");
-    Serial.println(stab.autoTargetRun(10));
-
-    Serial.println("\n Hour: ");
-    Serial.println(MMM.getHour());
-
-    Serial.println("\n Minute: ");
-    Serial.println(MMM.getMinute());
 }
