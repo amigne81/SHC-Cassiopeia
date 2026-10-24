@@ -22,7 +22,7 @@ private://************PRIVATE**************
 
     unsigned long previousTime;//milliseconds
     double angularPos;//degrees
-    double targetValue=142;//default: true north
+    double targetValue=142;//default: estimated azimuth
     double previousError;
 
     double output;
