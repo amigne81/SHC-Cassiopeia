@@ -64,10 +64,10 @@ int StabAlg::testRun() {
         //Setting up the derivative term
     double deltaDer = error-previousError;
     //Fixing wraparound problem:
-    if (deltaDer>180) {
+    while (deltaDer>180) {
         deltaDer = deltaDer-360;
     }
-    else if (deltaDer<-180) {
+    while (deltaDer<-180) {
         deltaDer = deltaDer+360;
     }
     derivative = ((deltaDer)/(currTime-previousTime))*1000;//using seconds, not milliseconds
@@ -132,10 +132,10 @@ int StabAlg::autoTargetRun(double minuteUpdate) {
         //Setting up the derivative term
     double deltaDer = error-previousError;
     //Fixing wraparound problem
-    if (deltaDer>180) {
+    while (deltaDer>180) {
         deltaDer = deltaDer-360;
     }
-    else if (deltaDer<-180) {
+    while (deltaDer<-180) {
         deltaDer = deltaDer+360;
     }
     derivative = ((deltaDer)/(currTime-previousTime))*1000;//using seconds, not milliseconds
