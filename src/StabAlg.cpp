@@ -254,7 +254,7 @@ void StabAlg::update(double min) {
 
     if(m9n.getSIV()<=2) {
         solenoidTranslate(testRun());
-        Serial.println("M9N Problem");
+        Serial.println("M9N Satellite Problem - StabAlg");
     }
     else {
         solenoidTranslate(autoTargetRun(min));//(recommended 10 min)
