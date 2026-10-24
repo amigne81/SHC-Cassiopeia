@@ -29,18 +29,18 @@ void setup() {
   Serial.begin(9600);
 
   //GPSinit();
-  //BNOinit();
-  //BMEinit();
+  BMEinit();
+  BNOinit();
 
 }
 
 //to test indiviudally comment out the ___test() and ___init() above
 void loop() {
-  GPStest();
+  //GPStest();
   Serial.println("\n");
-  // BNOtest();
-  Serial.println("\n");
-  //BMEtest();
+  BNOtest();
+  // Serial.println("\n");
+  BMEtest();
  // Serial.println("\n");
   delay(3000);
 }

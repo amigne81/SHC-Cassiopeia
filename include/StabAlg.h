@@ -42,7 +42,7 @@ public:
     //SFE_UBLOX_GNSS m9n;
     //BNO055 bno;
 
-    int testRun();//returns 1-> GO CLOCK; -1-> GO COUNTER; 0-> DO NOTHING
+    int testRun(double);//returns 1-> GO CLOCK; -1-> GO COUNTER; 0-> DO NOTHING
     int autoTargetRun(double);//similar to testRun, just auto changes the targetValue every inputted positive minutes
 
     void setTarget(double);
@@ -59,8 +59,8 @@ public:
 
     double findNewTarget();
 
-    void update(double);
-    void updateTestRun();
+    void update(double, double);
+    void updateTestRun(double);
     void solenoidTranslate(int);
     
 };//the devil, from the Bible

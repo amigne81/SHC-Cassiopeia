@@ -14,7 +14,7 @@
 //    sensors
 SFE_UBLOX_GNSS hotMenInYourArea = SFE_UBLOX_GNSS();
 //M9N hotMenInYourArea;
-BNO055 gayDar = BNO055();             // adafruit preset (55, 0x28, &Wire)
+extern BNO055 gayDar = BNO055();             // adafruit preset (55, 0x28, &Wire)
 SHC_BME280 guy = SHC_BME280();
 Adafruit_BMP3XX dude = Adafruit_BMP3XX();
 //Adafruit_INA260 power;
@@ -112,11 +112,13 @@ void setup() {
 }
 
 void loop() {
-  if(i==4){
-    recSensors();
-    i=0;
-  }
-  i++;
+
+
+  // if(i==4){
+  recSensors();
+  //   i=0;
+  // }
+  // i++;
 
   //sets dt for the entire loop, to keep the timing consistent with all functions
   rec.time.setdt();
@@ -170,7 +172,10 @@ void target_alt(){
   unsigned long currTime=millis();
 
   if(startTimeUK+25<=currTime) {
-    TheUK.update(10);
+    gayDar.prefetchData();
+     TheUK.updateTestRun(gayDar.getOrientationX());
+     Serial.println("OrientX: " + String(gayDar.getOrientationX()));
+    //TheUK.update(1, gayDar.getOrientationX());
     startTimeUK=millis();
   }
   //data collection goes here
@@ -190,7 +195,7 @@ void standby(){
 void fetch(){
   if(erMen){hotMenInYourArea.checkUblox();
   hotMenInYourArea.checkCallbacks();}
-  if(erGay)  {gayDar.prefetchData();}
+  gayDar.prefetchData();
   if(erGuy)  {guy.prefetchData();}
   if(erDude) {dude.performReading();}
 }
@@ -342,7 +347,7 @@ void testTargetValueInfo() {
     Serial.println(TheUK.findNewTarget());
 
     Serial.println("\n Dirrection: ");
-    Serial.println(TheUK.testRun());
+    Serial.println(TheUK.testRun(gayDar.getOrientationX()));
 
     Serial.println("\n Hour: ");
     Serial.println(hotMenInYourArea.getHour());
@@ -467,28 +472,9 @@ void setupSensors(){
   LEDs.off(); 
 
 Serial.println("M9N checked.");
-  // BNO055 bad
-  for(int i = 0; (i<= attempt_num) && (gayDar.init() == BNO_ERROR); i++){
-    Serial.println(" BNO055 not found   >:(");
-    if(i==attempt_num){
-      erGay = false;
-      Serial.println(" BNO055 failed to initialize.  IE2");
-      Serial1.print("BNO055-1, ");
-    }
-    delay(attempt_delay);
-  }
-
-  if(erGay){
-    chirp(5);
-  }
-
-  delay(1500);
-  LEDs.on();
-  delay(500);
-  LEDs.off();
+  
 
   //BME280 (evil dastardly bad guy)
-  Serial.println("BNO checked.");
   for(int i = 0; (i<= attempt_num) && (guy.init() == BME_ERROR); i++){
     Serial.println(" BME280 not found  )=:");
     delay(100);
@@ -514,6 +500,29 @@ Serial.println("M9N checked.");
   Serial.println("BME checked.");
   delay(500);
   //BMP3 good boy
+
+// BNO055 bad
+  for(int i = 0; (i<= attempt_num) && (gayDar.init() == BNO_ERROR); i++){
+    Serial.println(" BNO055 not found   >:(");
+    if(i==attempt_num){
+      erGay = false;
+      Serial.println(" BNO055 failed to initialize.  IE2");
+      Serial1.print("BNO055-1, ");
+    }
+    delay(attempt_delay);
+  }
+
+  if(erGay){
+    chirp(5);
+  }
+
+  delay(1500);
+  LEDs.on();
+  delay(500);
+  LEDs.off();
+
+  Serial.println("BNO checked.");
+
   for(int i = 0; (i<= attempt_num) && !(dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1)); i++){
     // Serial.print("the bmp is begingin? - ");
     //Serial.println(dude.begin_I2C(BMP3XX_DEFAULT_ADDRESS,&Wire1));
