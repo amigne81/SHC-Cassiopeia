@@ -19,7 +19,7 @@ StabAlgPlanB::StabAlgPlanB(double startAngle) {
     previousTime=millis();
 }
 
-StabAlgPlanB::setValues(double newStartAngle, int newHour, int newMin, double newLat, double newLong) {
+void StabAlgPlanB::setValues(double newStartAngle, int newHour, int newMin, double newLat, double newLong) {
     angularPos=newStartAngle;
     hour = newHour;
     min = newMin;

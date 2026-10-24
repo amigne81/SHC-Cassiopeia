@@ -23,21 +23,23 @@ StabAlg::StabAlg(SFE_UBLOX_GNSS& men, BNO055& bro)
         : m9n(men), bno(bro){
     //m9n = men;//copy of men
     //bno = bro;//copy of bro
+                                        //+180 because of BNO placement
+    double previousAngularPos = bno.getOrientationX()+180;//Sam? Do I need to run bno.prefetchData()?
 
-    double previousAngularPos = bno.getOrientationX();//Sam? Do I need to run bno.prefetchData()?
-
-    previousError = previousAngularPos-targetValue;
-    if (previousError>180) {
+    previousError = previousAngularPos-(targetValue+180+30);//+30 because of camera placement
+    while (previousError>180) {
         previousError = previousError-360;
     }
-    else if (previousError<-180) {
+    while (previousError<-180) {
         previousError = previousError+360;
     }//fixing wraparound problem
 
     previousTime=millis();
 }
 
-//This method is where the target value stays constant. Perfect for testing
+// Originally, this method was developed for testing purposes, when the M9N was not working
+// or when I wanted to assume a constant target. Now, this method has become a backup plan
+// in case the M9N failed during flight.
 int StabAlg::testRun() {
 
         //This prevents a division by zero when calculating derivative term
@@ -48,14 +50,14 @@ int StabAlg::testRun() {
 
         //Setting up the angularPos and the error term
     bno.prefetchData();//Sam??? Do I need this here???
-    angularPos = bno.getOrientationX();
+    angularPos = bno.getOrientationX()+180;
 
-    error = angularPos-(targetValue+30);
+    error = angularPos-(targetValue+30+180);
     //Fixing the wraparound problem:
-    if (error>180) {
+    while (error>180) {
         error = error-360;
     }
-    else if (error<-180) {
+    while (error<-180) {
         error = error+360;
     }
 
@@ -103,11 +105,11 @@ int StabAlg::autoTargetRun(double minuteUpdate) {
         targetValue = findNewTarget();
 
         //angularPos, in this case, would refer to the previous angularPos, as it hasn't updated yet
-        previousError = angularPos-targetValue;//adjusting the previousError to prevent a sudden jump from target changing
-        if (previousError>180) {
+        previousError = angularPos-(targetValue+180+30);//adjusting the previousError to prevent a sudden jump from target changing
+        while (previousError>180) {
             previousError = previousError-360;
         }
-        else if (previousError<-180) {
+        while (previousError<-180) {
             previousError = previousError+360;
         }//fixing wraparound problem
 
@@ -116,14 +118,14 @@ int StabAlg::autoTargetRun(double minuteUpdate) {
 
         //Setting up the angularPos and the error term
     bno.prefetchData();//Sam??? Do I need this here?
-    angularPos = bno.getOrientationX();
+    angularPos = bno.getOrientationX()+180;
 
-    error = angularPos-(targetValue+30);
+    error = angularPos-(targetValue+180+30);
     //Fixing wraparound problem    
-    if (error>180) {
+    while (error>180) {
         error = error-360;
     }
-    else if (error<-180) {
+    while (error<-180) {
         error = error+360;
     }
 
@@ -249,7 +251,14 @@ void StabAlg::solenoidTranslate(int instruction) {
 
 //Moves the solenoids based on adjusting target
 void StabAlg::update(double min) {
-    solenoidTranslate(autoTargetRun(min));//(recommended 10 min)
+
+    if(m9n.getSIV()<=2) {
+        solenoidTranslate(testRun());
+        Serial.println("M9N Problem");
+    }
+    else {
+        solenoidTranslate(autoTargetRun(min));//(recommended 10 min)
+    }
 }
 
 //Moves the solenoids based on constant target

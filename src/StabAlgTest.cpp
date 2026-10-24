@@ -27,7 +27,9 @@ void loop() {
 
     // testTargetValueInfo();
     // testSolenoids();
-    stab.updateTestRun();
+    // stab.updateTestRun();
+    // Stabtest();
+    stab.update(1);
 }
 
 void testTargetValueInfo() {
