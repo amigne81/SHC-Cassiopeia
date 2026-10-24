@@ -22,7 +22,7 @@ private://************PRIVATE**************
 
     unsigned long previousTime;//milliseconds
     double angularPos;//degrees
-    double targetValue=142;//default: estimated azimuth
+    double targetValue=0;//default: estimated azimuth;;142
     double previousError;
 
     double output;
@@ -30,8 +30,8 @@ private://************PRIVATE**************
     double derivative;//degrees per second
 
     //K values can be adjusted to anything you want
-    double Kp=2.8;//experimental value
-    double Kd=3;//experimental value
+    double Kp=1.8;//experimental value
+    double Kd=1;//experimental value
 
     double deadband=15;//degrees, default value from the bible
 
@@ -43,7 +43,7 @@ public:
     //BNO055 bno;
 
     int testRun(double);//returns 1-> GO CLOCK; -1-> GO COUNTER; 0-> DO NOTHING
-    int autoTargetRun(double);//similar to testRun, just auto changes the targetValue every inputted positive minutes
+    int autoTargetRun(double, double);//similar to testRun, just auto changes the targetValue every inputted positive minutes
 
     void setTarget(double);
     double getAngularPos();

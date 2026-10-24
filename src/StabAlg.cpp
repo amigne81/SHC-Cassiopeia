@@ -42,14 +42,6 @@ StabAlg::StabAlg(SFE_UBLOX_GNSS& men, BNO055& bro)
 // in case the M9N failed during flight.
 int StabAlg::testRun(double angularPos) {
 
-    angularPos-=180;
-    while (angularPos>180) {
-        angularPos = angularPos-360;
-    }
-    while (angularPos<-180) {
-        angularPos = angularPos+360;
-    }
-
         //This prevents a division by zero when calculating derivative term
     unsigned long currTime = millis();
     if (currTime==previousTime) {
@@ -57,10 +49,10 @@ int StabAlg::testRun(double angularPos) {
     }
 
         //Setting up the angularPos and the error term
-    bno.prefetchData();//Sam??? Do I need this here???
+    // bno.prefetchData();//Sam??? Do I need this here???
     // angularPos = bno.getOrientationX()+180;
 
-    error = angularPos-(targetValue+30);
+    error = angularPos+180-(targetValue+30);
     //Fixing the wraparound problem:
     while (error>180) {
         error = error-360;
@@ -88,29 +80,29 @@ int StabAlg::testRun(double angularPos) {
         //Setting up the control system PD
     output = (Kp * error) + (Kd * derivative);
 
-    Serial.print("Output: " + String(output));
-    Serial.print(";; Error: " + String(error));
-    Serial.print(";; Der: " + String(derivative));
-    Serial.print(";; angularPos" + String(angularPos));
+    // Serial.print("Output: " + String(output));
+    // Serial.print(";; Error: " + String(error));
+    // Serial.print(";; Der: " + String(derivative));
+    // Serial.print(";; angularPos" + String(angularPos));
 
         //Bang-Bang
     //thruster direction output
     if (output > deadband) {
-        digitalWrite(LED_BUILTIN, LOW);
+        // digitalWrite(LED_BUILTIN, LOW);
         return COUNTERCLOCKWISE;
     }
     else if (output < -deadband) {
-        digitalWrite(LED_BUILTIN, LOW);
+        // digitalWrite(LED_BUILTIN, LOW);
         return CLOCKWISE;
     }
-    digitalWrite(LED_BUILTIN, HIGH);
+    // digitalWrite(LED_BUILTIN, HIGH);
     return CLOCKFOOL;//thrusters don't turn on
 }
 
 //This method below should be placed in loop() because of the variable timeGoneBy. May work improperly otherwise.
 //Note: The target will not change strictly at minuteUpdate minutes. This is fine.
 //As long as angularPos gets initalized, we are golden. If not, uh....
-int StabAlg::autoTargetRun(double minuteUpdate) {
+int StabAlg::autoTargetRun(double minuteUpdate, double angularPos) {
 
         //This prevents a division by zero when calculating derivative term
     unsigned long currTime = millis();
@@ -123,7 +115,7 @@ int StabAlg::autoTargetRun(double minuteUpdate) {
         targetValue = findNewTarget();
 
         //angularPos, in this case, would refer to the previous angularPos, as it hasn't updated yet
-        previousError = angularPos-(targetValue+30);//adjusting the previousError to prevent a sudden jump from target changing
+        previousError = angularPos+180-(targetValue+30);//adjusting the previousError to prevent a sudden jump from target changing
         while (previousError>180) {
             previousError = previousError-360;
         }
@@ -135,10 +127,10 @@ int StabAlg::autoTargetRun(double minuteUpdate) {
     }
 
         //Setting up the angularPos and the error term
-    bno.prefetchData();//Sam??? Do I need this here?
-    angularPos = bno.getOrientationX()+180;
+    // bno.prefetchData();//Sam??? Do I need this here?
+    // angularPos = bno.getOrientationX()+180;
 
-    error = angularPos-(targetValue+30);
+    error = angularPos+180-(targetValue+30);
     //Fixing wraparound problem    
     while (error>180) {
         error = error-360;
@@ -148,15 +140,17 @@ int StabAlg::autoTargetRun(double minuteUpdate) {
     }
 
         //Setting up the derivative term
-    double deltaDer = error-previousError;
-    //Fixing wraparound problem
-    while (deltaDer>180) {
-        deltaDer = deltaDer-360;
-    }
-    while (deltaDer<-180) {
-        deltaDer = deltaDer+360;
-    }
-    derivative = ((deltaDer)/((currTime-previousTime)));//using seconds, not milliseconds
+    // double deltaDer = error-previousError;
+    // //Fixing wraparound problem
+    // while (deltaDer>180) {
+    //     deltaDer = deltaDer-360;
+    // }
+    // while (deltaDer<-180) {
+    //     deltaDer = deltaDer+360;
+    // }
+    // derivative = ((deltaDer)/((currTime-previousTime)));//using seconds, not milliseconds
+
+    derivative=bno.getGyroX();
 
     previousError = error;
         //Accounting for time gone by
@@ -168,19 +162,19 @@ int StabAlg::autoTargetRun(double minuteUpdate) {
     timeGoneBy += (millis()-k)/60000.0;
 
 
-    Serial.println("Output" + String(output));
+    // Serial.println("Output" + String(output));
 
         //Bang-Bang
     //thruster direction output
     if (output > deadband) {
-        digitalWrite(LED_BUILTIN, LOW);
+        // digitalWrite(LED_BUILTIN, LOW);
         return COUNTERCLOCKWISE;
     }
     else if (output < -deadband) {
-        digitalWrite(LED_BUILTIN, LOW);
+        // digitalWrite(LED_BUILTIN, LOW);
         return CLOCKWISE;
     }
-    digitalWrite(LED_BUILTIN, HIGH);
+    // digitalWrite(LED_BUILTIN, HIGH);
     return CLOCKFOOL;//thrusters don't turn on
 }
 
@@ -281,7 +275,7 @@ void StabAlg::update(double min, double angularPos) {
         Serial.println("M9N Satellite Problem - StabAlg");
     }
     else {
-        solenoidTranslate(autoTargetRun(min));//(recommended 10 min)
+        solenoidTranslate(autoTargetRun(min, angularPos));//(recommended 10 min)
     }
 }
 

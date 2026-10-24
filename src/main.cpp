@@ -173,9 +173,9 @@ void target_alt(){
 
   if(startTimeUK+25<=currTime) {
     gayDar.prefetchData();
-     TheUK.updateTestRun(gayDar.getOrientationX());
-     Serial.println("OrientX: " + String(gayDar.getOrientationX()));
-    //TheUK.update(1, gayDar.getOrientationX());
+    //  TheUK.updateTestRun(gayDar.getOrientationX());
+    //  Serial.println("OrientX: " + String(gayDar.getOrientationX()));
+    TheUK.update(10, gayDar.getOrientationX());
     startTimeUK=millis();
   }
   //data collection goes here
