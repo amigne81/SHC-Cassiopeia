@@ -30,8 +30,8 @@ private://************PRIVATE**************
     double derivative;//degrees per second
 
     //K values can be adjusted to anything you want
-    double Kp=1.5;//experimental value
-    double Kd=1;//experimental value
+    double Kp=2.8;//experimental value
+    double Kd=3;//experimental value
 
     double deadband=15;//degrees, default value from the bible
 

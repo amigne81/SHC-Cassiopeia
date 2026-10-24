@@ -42,7 +42,13 @@ StabAlg::StabAlg(SFE_UBLOX_GNSS& men, BNO055& bro)
 // in case the M9N failed during flight.
 int StabAlg::testRun(double angularPos) {
 
-    // angularPos+=180;
+    angularPos+=180;
+    while (angularPos>180) {
+        angularPos = angularPos-360;
+    }
+    while (angularPos<-180) {
+        angularPos = angularPos+360;
+    }
 
         //This prevents a division by zero when calculating derivative term
     unsigned long currTime = millis();
@@ -64,15 +70,17 @@ int StabAlg::testRun(double angularPos) {
     }
 
         //Setting up the derivative term
-    double deltaDer = error-previousError;
-    //Fixing wraparound problem:
-    while (deltaDer>180) {
-        deltaDer = deltaDer-360;
-    }
-    while (deltaDer<-180) {
-        deltaDer = deltaDer+360;
-    }
-    derivative = ((deltaDer)/((currTime-previousTime)));//using seconds, not milliseconds
+    // double deltaDer = error-previousError;
+    // //Fixing wraparound problem:
+    // while (deltaDer>180) {
+    //     deltaDer = deltaDer-360;
+    // }
+    // while (deltaDer<-180) {
+    //     deltaDer = deltaDer+360;
+    // }
+    // derivative = ((deltaDer)/((currTime-previousTime)));//using seconds, not milliseconds
+
+    derivative=bno.getGyroX();
 
     previousError = error;
     previousTime = currTime;
