@@ -209,12 +209,29 @@ void recMen(){
 
 //set UTC time to most recent time from satellite
 void setUTC(){
-  rec.UTC = String(mostRecentHour)	+", ";//+ 
-	String(mostRecentMinute) 		+", "+
-	String(mostRecentSecond) 		+", "+
-	String(mostRecentMonth) 			+", "+
-	String(mostRecentDay)			+", "+
-	String(mostRecentYear);	
+  Serial.println(mostRecentHour);
+  Serial.println(", ");//+ 
+	Serial.println(mostRecentMinute); 		
+  Serial.println(", ");
+	Serial.println(mostRecentSecond); 		
+  Serial.println(", ");
+	Serial.println(mostRecentMonth); 			
+  Serial.println(", ");
+	Serial.println(mostRecentDay);			
+  Serial.println(", ");
+	Serial.println(mostRecentYear);	
+
+  Serial1.println(mostRecentHour);
+  Serial1.println(", ");//+ 
+	Serial1.println(mostRecentMinute); 		
+  Serial1.println(", ");
+	Serial1.println(mostRecentSecond); 		
+  Serial1.println(", ");
+	Serial1.println(mostRecentMonth); 			
+  Serial1.println(", ");
+	Serial1.println(mostRecentDay);			
+  Serial1.println(", ");
+	Serial1.println(mostRecentYear);	
 }
 
 //record bno data
@@ -269,6 +286,7 @@ void recSensors(){
 void output(){
   Serial1.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
   Serial.println(rec.outCSV()); // replace -1 w/ current time from rework clock function
+  setUTC();
   Serial1.print(hotMenInYourArea.getSIV());
 }
 
@@ -510,10 +528,11 @@ Serial.println("M9N checked.");
     delay(attempt_delay);
   }
   if(erDude){
-  dude.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
-  dude.setPressureOversampling(BMP3_OVERSAMPLING_4X);
-  dude.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
-  dude.setOutputDataRate(BMP3_ODR_50_HZ);
+    dude.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
+    dude.setPressureOversampling(BMP3_OVERSAMPLING_4X);
+    dude.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
+    dude.setOutputDataRate(BMP3_ODR_50_HZ);
+    chirp(5);
   }
   
   delay(1500);
