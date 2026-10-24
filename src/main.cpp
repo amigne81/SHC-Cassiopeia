@@ -24,7 +24,7 @@ Data rec = Data();
 StabAlg TheUK = StabAlg(hotMenInYourArea, gayDar);
 LED LEDs(2);
 
-// --------------- fix gps prettiest pleases --------------------------
+int temp;
 
 int mostRecentYear = 0;
 int mostRecentMonth = 0;
@@ -36,8 +36,6 @@ int mostRecentSIV = 0;
 double mostRecentLongitude = 0.0;
 double mostRecentLatitude = 0.0;
 double mostRecentAltitude = 0.0;
-
-// --------------------------------------------------------------------
 
 // global variable intialization
 const int solenoid_pin1 = 3;
@@ -106,6 +104,10 @@ void setup() {
   delay(750);
   setupSensors();
 
+  testSolenoids();
+  chirp(5);
+  chirp(5);
+
   startTimeUK=millis();
 }
 
@@ -115,10 +117,20 @@ void loop() {
     i=0;
   }
   i++;
+
+  //sets dt for the entire loop, to keep the timing consistent with all functions
   rec.time.setdt();
   
-  rec.state = stateCheck();
+  //===================================================================================================================================================
+  //FRR TESTING
+  rec.state = 1;
+  //====================================================================================================================================================
+  
+  //UNCOMMENT AFTER TESTING
+  //rec.state = stateCheck();
 
+  //takes in the state, calls the function for that state
+  //ex. rec.state = 1 -> stabilize
   switch(rec.state){
     case 0:
       below_target();
@@ -128,6 +140,7 @@ void loop() {
       break;
     case 2:
       descent();
+      break;
     case 3:
       standby();
       break;
@@ -147,10 +160,12 @@ void loop() {
   // delay(5000) // for testing
 }
 
+//when we are below target do nothing
 void below_target(){
 
 }
 
+//when we are at target alt run stabilization alg
 void target_alt(){
   unsigned long currTime=millis();
 
@@ -161,14 +176,17 @@ void target_alt(){
   //data collection goes here
 }
 
+//in descent do nothing
 void descent(){
 
 }
 
+//in standby delay to conserve battery
 void standby(){
   delay(standby_delay);
 }
 
+//get the data from the sensors
 void fetch(){
   if(erMen){hotMenInYourArea.checkUblox();
   hotMenInYourArea.checkCallbacks();}
@@ -177,6 +195,7 @@ void fetch(){
   if(erDude) {dude.performReading();}
 }
 
+//record gps data
 void recMen(){
   // Serial.println("M9N");
   // Serial.println(millis());
@@ -188,6 +207,7 @@ void recMen(){
   
 }
 
+//set UTC time to most recent time from satellite
 void setUTC(){
   rec.UTC = String(mostRecentHour)	+", ";//+ 
 	String(mostRecentMinute) 		+", "+
@@ -197,6 +217,7 @@ void setUTC(){
 	String(mostRecentYear);	
 }
 
+//record bno data
 void gayWreck(){
   // Serial.println("BNO:");
   // Serial.println(millis());
@@ -214,6 +235,7 @@ void gayWreck(){
   // Serial.println(millis());
 }
 
+//record bme data
 void recGuy(){
   // Serial.println("BME: ");
   // Serial.println(millis());
@@ -223,6 +245,7 @@ void recGuy(){
   // Serial.println(millis());
 }
 
+//record bmp data
 void recDude(){
   // Serial.println("BMP");
   // Serial.println(millis());
@@ -232,6 +255,7 @@ void recDude(){
   // Serial.println(millis());
 }
 
+//record all sensors
 void recSensors(){
   fetch();
 
@@ -241,12 +265,14 @@ void recSensors(){
   if(erDude){recDude();}
 }
 
+//output to serial
 void output(){
-  //Serial1.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
+  Serial1.print(rec.outCSV()); // replace -1 w/ current time from rework clock function
   Serial.println(rec.outCSV()); // replace -1 w/ current time from rework clock function
-  Serial.println("loop");
+  Serial1.print(hotMenInYourArea.getSIV());
 }
 
+//blink LEDs at 1 hz
 void blink(){
   LED_count+=rec.time.dt;
   // Serial.print("LED t: ");
@@ -262,6 +288,7 @@ if(LEDs.getState()){
   }
 }
 
+//chirps buzzer once
 void chirp(int pin){
   for(int i = 0; i < 400; i++){
         digitalWrite(pin,HIGH);
@@ -277,6 +304,7 @@ void chirp(int pin){
     } 
 }
 
+//test solenoids
 void testSolenoids() {
     delay(1000);
 
@@ -289,6 +317,7 @@ void testSolenoids() {
     digitalWrite(solenoid_pin2, LOW);
 }
 
+//uses printlns to test target value
 void testTargetValueInfo() {
     //Testing Target Value
     Serial.print("Target value: ");
@@ -304,67 +333,31 @@ void testTargetValueInfo() {
     Serial.println(hotMenInYourArea.getMinute());
 }
 
-void solenoidsTranslate(int instruction) {    
-    //Running the test to see if the payload spins correctly
-    // int instruction = update();//stab.testRun();
-
-    if (instruction==CLOCKWISE) {//turn on 'right' solenoid???
-        digitalWrite(solenoid_pin1,LOW);
-        digitalWrite(solenoid_pin2,HIGH);
-        Serial.println("clockwise");
-    }
-    else if (instruction==COUNTERCLOCKWISE) {//turn on 'left' solenoid???
-        digitalWrite(solenoid_pin2, LOW);
-        digitalWrite(solenoid_pin1, HIGH);
-        Serial.println("counter");
-    }
-    else if (instruction==2) {//do nothing. Even the solenoids aren't being turned off        
-        Serial.println("nothing");
-    }
-    else {//instruction==CLOCKFOOL -> turn everything off
-        digitalWrite(solenoid_pin1, LOW);
-        digitalWrite(solenoid_pin2, LOW);
-        Serial.println("fool");
-    }
-
-    Serial.println(TheUK.getAngularPos());
-
-    //delay(50);//for testing, we will use delay. For the flight code, don't
-}
 int lastDur = 0;
-
 
 int stateCheck(){
   static unsigned long int dur[4];
-  // int dih = rec.getDh();
-  // int h = rec.getH();
+  int dih = rec.getDh();
+  int h = rec.getH();
+  long t = millis();
 
 
   // testing -------------------------------------- this never went into landing stage bc it was continuously decrasing
-  //long h = 25000;
-  //long dih = 0;
+//   long h;
+//   long dih;
+//   h = (-(77/56)*(t/1000)*((t/1000)-300));
+//   //dih = (-77/5)*(2*t-300);
+
+
+//   Serial.print("h:     ");
+//   Serial.println(h);
+//   Serial.print("t:     ");
+//   Serial.println(t);
+//   Serial.println("dih: ");
+//  Serial.println(dih);
   // -----------------------------------------------------
 
-
-  long t = millis();
-  static long h;
-  long dih = h;
-
-
-  h = (-(77/56)*(t/1000)*((t/1000)-300));
-  dih = (h-dih)/2;
-
-
-Serial.print("h:     ");
-Serial.println(h);
-Serial.print("t:     ");
-Serial.println(t);
-Serial.println(t-lastDur);
-Serial.println(dih);
-
-
-
-
+  
 
   // checks values based on state: can move forward only one state at a time
   switch(rec.state){
@@ -384,7 +377,6 @@ Serial.println(dih);
 
     case 1: // target alt to descent
     if(dih < 0){
-      Serial.println("AAAAAAAAAAAAAAAAAAAAA");
       if((t-lastDur) > 30000){
         lastDur = t;
         // return 2;
@@ -395,20 +387,13 @@ Serial.println(dih);
     else{
       lastDur = t;
     }
-    // if(dih<0){
-      //   dur[1]+= rec.time.dt;
-      // }else if(h < target_altitude){  // revert chack to state ascent
-      //   dur[1] = 0;
-      //   dur[0] += rec.time.dt;
-      // }else{dur[0]=0; dur[1]=0; dur[2] = 0;}
-      break;
+    break;
 
 
     case 2: // descent to standby
-      if(dih < 0.1 && dih > 0.1){
+      if(dih <= 1 && dih >= -1){
         if((t-lastDur) > 100000){
           lastDur = t;
-          // return 3;
           rec.state = 3;
           return 3;
         }
@@ -416,24 +401,11 @@ Serial.println(dih);
       else{
         lastDur = t;
       }
-      // if((dih > standby_thresh || dih < -standby_thresh) && h < target_altitude){
-      //   dur[2] += rec.time.dt;
-      // }else if(dih<0){ // revert check to descent
-      //   dur[1] += rec.time.dt;
-      //   if(dur[1] > rec.time.dt*standby_exit_mod) // because negative dh could be higher than expected while in standby it must be continous for longer to reset progress towards standby
-      //     dur[2] = 0;
-      // }else{dur[0]=0; dur[1]=0; dur[2] = 0;}
       break;
 
 
     case 3: // standby operates seperate from others and only goes to target altitude
-      // if(h > target_altitude){
-      //   dur[3] += rec.time.dt;
-      // }else{dur[3]=0;}
-      // if(dur[3] >= emergency_standby_exit){
-      //   return 1;
-      // }
-      if(dih > 1){
+      if(dih <= 1 && dih >= -1){
         if((t-lastDur) > 100000){
           lastDur = t;
           // return 3;
@@ -447,16 +419,11 @@ Serial.println(dih);
       break;
   }
 
-
-  // for(int i = 2; i>=0;i--){
-  //   Serial.println(dur[i]);
-  //   if(dur[i]>tReq[i]){ // prioritizes highest state
-  //     return i;
-  //   }
-  // }
+  temp = h;
   return rec.state;
 }
 
+//initializes sensors
 void setupSensors(){
   // M9N
   LEDs.on();
@@ -547,54 +514,41 @@ Serial.println("M9N checked.");
   dude.setPressureOversampling(BMP3_OVERSAMPLING_4X);
   dude.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
   dude.setOutputDataRate(BMP3_ODR_50_HZ);
-  chirp(5);
   }
-
   
   delay(1500);
   LEDs.on();
   delay(500);
   LEDs.off();
 
-/*
-  // INA260 also evil  bad never ever ever again
-  power = Adafruit_INA260();
-  for(int i = 0; (i<= attempt_num) || !power.begin(); i++){
-    Serial.println(" INA260 not found    :()");
-    if(i==attempt_num){
-      erDude = false;
-      Serial.println(" INA260 failed to initialize. IE5");
-      Serial1.print("INA260-1, ");
-    }
-    delay(attempt_delay);
-  }
-*/
-Serial.println("d");
   Serial.println(" Sensors Initlialized: .");
   if(erMen){Serial.println("\n  M9N");}
   if(erGay){Serial.println("\n  BNO055");}
   if(erGuy){Serial.println("\n  BME280");}
   if(erDude){Serial.println("\n  BMP3");}
   if(!(erMen|| erGay|| erGuy|| erDude)){Serial.println("\n  None");}
-  
- 
 }
 
+//print bmp
 void outDude(){
   Serial.println("tempE: " + String(dude.readTemperature(),5));
   Serial.println("presr: " + String(dude.readPressure(),5));
 }
 
+//print bme
 void outGuy(){
   Serial.println("tempI: "+ String(guy.getTemperature(),5));
   Serial.println("humid: "+ String(guy.getHumidity()));
 }
 
+//print gps
 void outMen(){
   Serial.println("Longitude: "+ hotMenInYourArea.getLongitude());
   Serial.println("Latitude: "+ hotMenInYourArea.getLatitude());
   Serial.println("Altitude: "+ hotMenInYourArea.getAltitude());
 }
+
+//print bno
 void outCloset(){
   Serial.println("orient X: " + String(gayDar.getOrientationX()));
   Serial.println("orient Y: " + String(gayDar.getOrientationY()));
@@ -609,6 +563,7 @@ void outCloset(){
   Serial.println("ACC Z: " + String(gayDar.getAccelerationZ()));
 }
 
+//checks for data updates in the gps, if yes, collect the data
 void pvtCallback(UBX_NAV_PVT_data_t *ubxDataStruct) {
     mostRecentLatitude = ((double)ubxDataStruct->lat) * pow(10, -7);
     mostRecentLongitude = ((double)ubxDataStruct->lon) * pow(10, -7);
@@ -623,6 +578,7 @@ void pvtCallback(UBX_NAV_PVT_data_t *ubxDataStruct) {
     mostRecentSIV = ubxDataStruct->numSV;
 }
 
+//intializes the gps
 Error init() {
     if (!hotMenInYourArea.begin()) {
         return M9N_ERROR;
@@ -651,6 +607,7 @@ Error init() {
     return NO_ERROR;
 }
 
+//gets data for gps
 bool prefetchData() {
     hotMenInYourArea.checkUblox();
     hotMenInYourArea.checkCallbacks();
@@ -666,5 +623,3 @@ bool prefetchData() {
     // SIV = mostRecentSIV;
     return true;
 }
-
-

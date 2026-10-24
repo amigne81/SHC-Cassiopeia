@@ -49,6 +49,6 @@ String Data::outCSV(){
 	Serial.println(time.UTC());
 	return Data::ID + ", " + String(time.t()) + ", " + UTC +
 	String(Data::count) + ", " + String(Data::state)+ ", " + String(Data::GPS.getZ()) +  ", " + 
-	String(Data::tempI) + ", " + Data::Acc.outCSV() + ", " + Data::Gyro.outCSV() + ", " + Data::GPS.outCSV() + ", " +
+	String(Data::tempI) + ", " + Data::Acc.outCSV() + Data::Gyro.outCSV() + Data::GPS.outCSV() + ", " +
 	String(pressure) + ", " + String(humidity);
 }
