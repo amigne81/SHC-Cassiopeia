@@ -279,6 +279,15 @@ void StabAlg::update(double min, double angularPos) {
     }
 }
 
+void StabAlg::init() {
+    if(m9n.getSIV()<=2) {
+        findNewTarget();
+    }
+    else {
+        targetValue=AVG_TARGET;
+    }
+}
+
 //Moves the solenoids based on constant target
 void StabAlg::updateTestRun(double angularPos) {
     solenoidTranslate(testRun(angularPos));

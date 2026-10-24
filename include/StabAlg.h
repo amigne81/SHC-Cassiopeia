@@ -35,6 +35,8 @@ private://************PRIVATE**************
 
     double deadband=15;//degrees, default value from the bible
 
+    const double AVG_TARGET = 142;
+
 public:
 
     StabAlg(SFE_UBLOX_GNSS&, BNO055&);
@@ -62,6 +64,8 @@ public:
     void update(double, double);
     void updateTestRun(double);
     void solenoidTranslate(int);
+
+    void init();
     
 };//the devil, from the Bible
 

@@ -109,6 +109,8 @@ void setup() {
   chirp(5);
 
   startTimeUK=millis();
+  delay(750);
+  TheUK.init();
 }
 
 void loop() {
